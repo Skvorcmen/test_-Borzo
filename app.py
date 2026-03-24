@@ -4,6 +4,8 @@ from flask import Flask, render_template, request, jsonify, session
 from functools import wraps
 import uuid
 
+# Проверьте начало app.py
+head -20 app.py
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "borzo_secret_key_change_in_production")
 
