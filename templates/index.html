@@ -770,8 +770,6 @@
 
         // ГЛАВНАЯ ИСПРАВЛЕННАЯ ФУНКЦИЯ
         async function saveAttachment(messageIndex) {
-            console.log("=== saveAttachment called for message", messageIndex);
-
             const titleEl = document.getElementById('asset-title-' + messageIndex);
             const typeEl = document.getElementById('asset-type-' + messageIndex);
             const valueEl = document.getElementById('asset-value-' + messageIndex);
@@ -787,7 +785,11 @@
             }
 
             if (type === 'image' && fileEl && fileEl.files && fileEl.files[0]) {
-                value = await readFileAsDataURL(fileEl.files[0]);
+                const reader = new FileReader();
+                value = await new Promise((resolve) => {
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(fileEl.files[0]);
+                });
             }
 
             if (!value) {
@@ -799,9 +801,22 @@
             if (!msg.attachments) msg.attachments = [];
             msg.attachments.push({ title, type, value });
 
-            console.log("Attachment added, now saving...");
-            await saveDataAndRender();
-            assetEditIndex = null;
+            const response = await fetch('/api/data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(state)
+            });
+
+            if (response.ok) {
+                assetEditIndex = null;
+                const dataRes = await fetch('/api/data');
+                state = await dataRes.json();
+                render();
+            } else {
+                msg.attachments.pop();
+                renderCenter();
+                alert("Ошибка сохранения");
+            }
         }
 
         function removeAttachment(messageIndex, attachmentIndex) {
