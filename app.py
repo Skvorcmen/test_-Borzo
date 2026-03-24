@@ -394,12 +394,16 @@ def get_data():
 @app.route("/api/data", methods=["POST"])
 @require_auth  # <-- ВАЖНО: только require_auth, НЕ require_owner
 def save_data_route():
-    """Сохранение данных - доступно всем авторизованным"""
+    """Сохранение данных"""
     new_data = request.json
     current_role = session.get("role")
-    print(f"DEBUG: Saving data from role: {current_role}")
+    print(f"=== SAVE DEBUG ===")
+    print(f"Session role: {current_role}")
+    print(f"Session contents: {dict(session)}")
+    print(f"Request data size: {len(str(new_data))}")
     new_data["role"] = current_role
     save_data(new_data)
+    print("=== SAVE COMPLETE ===")
     return jsonify({"success": True})
 
 
@@ -577,3 +581,4 @@ def get_messages():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
     app.run(debug=False, host="0.0.0.0", port=port)
+
