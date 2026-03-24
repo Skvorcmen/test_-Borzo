@@ -1456,36 +1456,6 @@
             }
         }
 
-        async function copyAttachment(messageIndex, attachmentIndex) {
-            const msg = state.blocks[state.currentBlock].messages[messageIndex];
-            const att = msg.attachments[attachmentIndex];
-            if (!att) return;
-
-            if (att.type === 'image') {
-                // Для изображений - скачиваем файл
-                const link = document.createElement('a');
-                link.href = att.value;
-                link.download = `${att.title || 'image'}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                alert(`Изображение "${att.title}" скачано! Теперь его можно отправить клиенту как файл.`);
-            } else {
-                // Для ссылок - копируем текст
-                try {
-                    await navigator.clipboard.writeText(att.value);
-                    alert("Ссылка скопирована!");
-                } catch (err) {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = att.value;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                    alert("Ссылка скопирована!");
-                }
-            }
-        }
 
         function renderMain() {
             const el = document.getElementById('mainList');
