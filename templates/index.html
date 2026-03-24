@@ -1525,9 +1525,12 @@
             });
         }
 
-        async function saveAttachment(messageIndex) {
-            console.log("=== saveAttachment called for message", messageIndex);
+        // Проверить, что saveAttachment существует
+        console.log(typeof saveAttachment);
 
+        // Временно заменить saveAttachment на версию с принудительным логированием
+        window.saveAttachment = async function(messageIndex) {
+            console.log("!!! saveAttachment called !!!");
             const titleEl = document.getElementById('asset-title-' + messageIndex);
             const typeEl = document.getElementById('asset-type-' + messageIndex);
             const valueEl = document.getElementById('asset-value-' + messageIndex);
@@ -1543,9 +1546,11 @@
             }
 
             if (type === 'image' && fileEl && fileEl.files && fileEl.files[0]) {
-                console.log("Reading image file...");
-                value = await readFileAsDataURL(fileEl.files[0]);
-                console.log("Image loaded, length:", value.length);
+                const reader = new FileReader();
+                value = await new Promise((resolve) => {
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(fileEl.files[0]);
+                });
             }
 
             if (!value) {
@@ -1557,14 +1562,26 @@
             if (!msg.attachments) msg.attachments = [];
             msg.attachments.push({ title, type, value });
 
-            console.log("Attachment added, total attachments:", msg.attachments.length);
-            console.log("Current user role:", currentUserRole);
+            console.log("Attachment added, now saving via fetch...");
 
-            // Сохраняем
-            await saveDataAndRender();
-
-            // Закрываем редактор
-            assetEditIndex = null;
+            // Прямой вызов fetch для сохранения
+            try {
+                const response = await fetch('/api/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(state)
+                });
+                console.log("Fetch response status:", response.status);
+                if (response.ok) {
+                    console.log("Data saved successfully!");
+                    assetEditIndex = null;
+                    render();
+                } else {
+                    console.error("Save failed with status:", response.status);
+                }
+            } catch (e) {
+                console.error("Save error:", e);
+            }
         }
 
         function removeAttachment(messageIndex, attachmentIndex) {
