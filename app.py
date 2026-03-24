@@ -555,6 +555,7 @@ def reject_proposal(proposal_id):
             if comment:
                 if "managerMessages" not in data:
                     data["managerMessages"] = []
+                # Добавляем только ОДНО сообщение
                 data["managerMessages"].append(
                     {
                         "text": f'Предложение "{p.get("condition", "")}" отклонено. Причина: {comment}'
@@ -573,6 +574,7 @@ def get_messages():
         return jsonify({"messages": []})
     data = load_data()
     messages = data.get("managerMessages", [])
+    # Очищаем сообщения после отправки
     data["managerMessages"] = []
     save_data(data)
     return jsonify({"messages": messages})
@@ -581,4 +583,3 @@ def get_messages():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
     app.run(debug=False, host="0.0.0.0", port=port)
-

@@ -796,17 +796,28 @@
 
         async function checkMessages() {
             if (currentUserRole !== 'manager') return;
-            if (messageShown) return;
+            if (messageShown) return; // Не показываем, если уже показано
+
             try {
                 const data = await apiCall('/api/messages', 'GET');
                 if (data.messages && data.messages.length) {
                     messageShown = true;
+
+                    // Показываем ВСЕ сообщения (может быть несколько)
                     for (const msg of data.messages) {
                         await showAlertModal('Ответ от руководителя', msg.text);
                     }
+
+                    // Обновляем данные
                     state = await loadData();
-                    if (state) render();
-                    setTimeout(() => { messageShown = false; }, 3000);
+                    if (state) {
+                        render();
+                    }
+
+                    // Сбрасываем флаг через 3 секунды, чтобы новые сообщения могли быть показаны
+                    setTimeout(() => {
+                        messageShown = false;
+                    }, 3000);
                 }
             } catch (e) {
                 console.error(e);
