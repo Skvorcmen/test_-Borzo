@@ -382,7 +382,6 @@ def check_auth():
     return jsonify({"role": None})
 
 
-# ВАЖНО: ДОБАВЛЯЕМ GET МАРШРУТ
 @app.route("/api/data", methods=["GET"])
 def get_data():
     """Получение всех данных"""
@@ -393,28 +392,14 @@ def get_data():
 
 
 @app.route("/api/data", methods=["POST"])
-@require_auth
+@require_auth  # <-- ВАЖНО: только require_auth, НЕ require_owner
 def save_data_route():
-    """Сохранение данных"""
+    """Сохранение данных - доступно всем авторизованным"""
     new_data = request.json
     current_role = session.get("role")
     print(f"DEBUG: Saving data from role: {current_role}")
-    print(f"DEBUG: Block being saved: {new_data.get('currentBlock')}")
-
-    # Проверяем вложения
-    block_name = new_data.get("currentBlock")
-    if block_name and block_name in new_data.get("blocks", {}):
-        messages = new_data["blocks"][block_name].get("messages", [])
-        for i, msg in enumerate(messages):
-            attachments = msg.get("attachments", [])
-            if attachments:
-                print(f"DEBUG: Message {i} has {len(attachments)} attachments")
-                for att in attachments:
-                    print(f"DEBUG:   - {att.get('title')}: {att.get('type')}")
-
     new_data["role"] = current_role
     save_data(new_data)
-    print("DEBUG: Data saved successfully")
     return jsonify({"success": True})
 
 
