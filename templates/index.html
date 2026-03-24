@@ -7,8 +7,283 @@
     <title>BORZO - Script Navigator</title>
     <link rel="icon" href="data:,">
     <style>
-        /* ... весь ваш CSS ... */
-        /* (скопируйте ваш CSS из предыдущей версии) */
+        :root {
+            --bg: #3a3a3a;
+            --bg2: #474747;
+            --panel: #f8f7f3;
+            --white: #fff;
+            --line: #ddd8cf;
+            --text: #222;
+            --muted: #6f6a63;
+            --gold: #c9a24a;
+            --gold2: #a9852f;
+            --goldsoft: #f7edd6;
+            --bluesoft: #edf4ff;
+            --danger: #c64c4c;
+            --green: #189c54;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(180deg, var(--bg), var(--bg2));
+            color: var(--text);
+        }
+        header {
+            height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 22px;
+            background: rgba(20, 20, 20, .18);
+            border-bottom: 1px solid rgba(201, 162, 74, .35);
+        }
+        .brand { display: flex; align-items: center; gap: 14px; }
+        .logo {
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            font-size: 28px;
+            background: #2f2f2f;
+        }
+        .header-title { font-size: 20px; font-weight: 700; color: #fff; }
+        .header-sub { font-size: 12px; color: #ddd; margin-top: 4px; }
+        .role-select {
+            border: 1px solid rgba(201, 162, 74, .45);
+            background: #2f2f2f;
+            color: #fff;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .layout {
+            display: grid;
+            grid-template-columns: 300px 1fr 340px;
+            gap: 16px;
+            padding: 16px;
+            min-height: calc(100vh - 82px);
+        }
+        .panel {
+            background: var(--panel);
+            border: 1px solid rgba(255, 255, 255, .16);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, .15);
+        }
+        .white { background: var(--white); }
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .section-title { font-size: 22px; font-weight: 800; }
+        .muted { font-size: 12px; color: var(--muted); }
+        .list { display: flex; flex-direction: column; gap: 8px; }
+        .item {
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 12px;
+            padding: 12px 14px;
+            transition: all .15s ease;
+            cursor: pointer;
+        }
+        .item:hover { border-color: var(--gold); background: #fffaf1; }
+        .item.active {
+            border-color: var(--gold);
+            background: #fff7e8;
+            box-shadow: 0 0 0 2px rgba(201, 162, 74, .12) inset;
+        }
+        .item-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .item-title { flex: 1; font-weight: 700; }
+        .hidden-actions {
+            display: flex;
+            gap: 6px;
+            min-width: 74px;
+            justify-content: flex-end;
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .item:hover .hidden-actions,
+        .item.active .hidden-actions,
+        .item.show .hidden-actions {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .input, .textarea, .item-input {
+            width: 100%;
+            border: 1px solid #d7d2c7;
+            border-radius: 10px;
+            padding: 10px 12px;
+            background: #fff;
+            font: inherit;
+        }
+        .textarea { min-height: 120px; resize: vertical; }
+        .icon-btn, .small-btn, .copy-btn {
+            border: 1px solid var(--line);
+            background: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            font: inherit;
+        }
+        .icon-btn { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .small-btn { padding: 10px 12px; font-size: 13px; }
+        .copy-btn {
+            min-height: 48px;
+            min-width: 148px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 800;
+            background: var(--gold);
+            border-color: var(--gold2);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(201, 162, 74, .18);
+        }
+        .gold-btn { background: var(--gold); border-color: var(--gold2); color: #fff; }
+        .danger-btn { color: var(--danger); }
+        .return-btn {
+            background: var(--danger);
+            border-color: #b54444;
+            color: #fff;
+            font-size: 20px;
+            font-weight: 800;
+            padding: 16px 20px;
+            min-width: 320px;
+        }
+        .center-title { font-size: 34px; font-weight: 800; margin-bottom: 4px; }
+        .center-sub { font-size: 18px; font-weight: 800; margin-bottom: 14px; }
+        .center-sub.main { color: var(--green); }
+        .center-sub.side { color: var(--muted); }
+        .info-box { border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; line-height: 1.45; }
+        .gold-box { background: var(--goldsoft); border: 1px solid #ead39f; }
+        .blue-box { background: var(--bluesoft); border: 1px solid #c7d8ff; }
+        .card {
+            border: 2px solid #2f3237;
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 14px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, .06);
+        }
+        .card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .card-body { flex: 1; min-width: 0; }
+        .card-text { white-space: pre-wrap; line-height: 1.62; font-size: 18px; color: #2a2a2a; user-select: text; }
+        .card-label { font-size: 12px; font-weight: 900; color: var(--gold2); text-transform: uppercase; letter-spacing: .6px; }
+        .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .divider { height: 1px; background: #e7e3da; margin: 14px 0; }
+        .empty { padding: 14px; border: 1px dashed #cfcac0; border-radius: 12px; background: #fff; color: var(--muted); }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 7px;
+            border-radius: 999px;
+            background: var(--danger);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .proposal-card { border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: #fff; margin-bottom: 8px; }
+        .proposal-title { font-weight: 700; margin-bottom: 6px; }
+        .attachments-row { display: flex; gap: 10px; overflow-x: auto; padding: 6px 0 2px 0; margin-top: 8px; }
+        .asset-chip {
+            min-width: 120px;
+            max-width: 140px;
+            border: 1px solid #d7d2c7;
+            border-radius: 10px;
+            padding: 6px;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .asset-chip-title { font-size: 12px; font-weight: 700; color: #444; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .asset-chip-preview {
+            height: 60px;
+            border: 1px solid #ece7dc;
+            border-radius: 8px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: 4px;
+        }
+        .asset-chip-preview img { max-width: 100%; max-height: 100%; display: block; border-radius: 8px; }
+        .asset-chip-link { font-size: 11px; line-height: 1.3; color: #555; word-break: break-all; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+        .asset-editor { margin-top: 10px; border-top: 1px solid #e7e3da; padding-top: 10px; }
+        .asset-editor-grid { display: grid; grid-template-columns: 1fr 120px; gap: 8px; }
+        .asset-file { font: inherit; }
+        .drag-handle {
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            background: #fff;
+            color: #666;
+            cursor: grab;
+            user-select: none;
+        }
+        .drag-handle:active { cursor: grabbing; }
+        .material-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+        .app-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .app-modal-backdrop.show { display: flex; }
+        .app-modal {
+            width: min(560px, calc(100vw - 32px));
+            background: #fff;
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, .25);
+            padding: 16px;
+        }
+        .app-modal-title { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+        .app-modal-text { font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+        .app-modal-input, .app-modal-textarea {
+            width: 100%;
+            border: 1px solid #d7d2c7;
+            border-radius: 10px;
+            padding: 10px 12px;
+            background: #fff;
+            font: inherit;
+        }
+        .app-modal-textarea { min-height: 120px; resize: vertical; }
+        .app-modal-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; margin-top: 12px; }
+        .login-modal .role-buttons { display: flex; gap: 12px; margin-bottom: 16px; }
+        .login-modal .role-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 1px solid var(--line);
+            background: #fff;
+            transition: all 0.2s;
+        }
+        .login-modal .role-btn.active { background: var(--gold); border-color: var(--gold2); color: #fff; }
+        .login-modal .password-field { display: none; }
+        .login-modal .password-field.show { display: block; }
+        @media (max-width:1150px) { .layout { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -33,9 +308,7 @@
 
     <div class="layout">
         <aside class="panel">
-            <div class="section-head">
-                <div class="section-title">Магистраль</div>
-            </div>
+            <div class="section-head"><div class="section-title">Магистраль</div></div>
             <div id="mainList" class="list"></div>
             <div class="divider"></div>
             <div class="section-head">
@@ -46,13 +319,9 @@
             <div id="proposalList" class="list"></div>
         </aside>
 
-        <main class="panel white">
-            <div id="center"></div>
-        </main>
+        <main class="panel white"><div id="center"></div></main>
 
-        <aside class="panel">
-            <div id="right"></div>
-        </aside>
+        <aside class="panel"><div id="right"></div></aside>
     </div>
 
     <div id="appModalBackdrop" class="app-modal-backdrop">
@@ -85,10 +354,7 @@
         const escJs = s => String(s || '').replaceAll('\\', '\\\\').replaceAll("'", "\\'");
 
         async function apiCall(url, method, data = null) {
-            const options = {
-                method: method,
-                headers: { 'Content-Type': 'application/json' }
-            };
+            const options = { method, headers: { 'Content-Type': 'application/json' } };
             if (data) options.body = JSON.stringify(data);
             const response = await fetch(API_BASE + url, options);
             if (!response.ok) {
@@ -100,31 +366,22 @@
 
         async function loadData() {
             try {
-                console.log("Loading data...");
                 const response = await fetch(API_BASE + '/api/data');
                 if (!response.ok) {
-                    if (response.status === 401) {
-                        showLoginModal();
-                        return null;
-                    }
+                    if (response.status === 401) { showLoginModal(); return null; }
                     throw new Error('Ошибка загрузки данных');
                 }
                 return await response.json();
-            } catch (e) {
-                console.error(e);
-                return null;
-            }
+            } catch (e) { console.error(e); return null; }
         }
 
         async function saveData(data) {
             try {
-                console.log("Saving data...");
                 const response = await fetch(API_BASE + '/api/data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-                console.log("Response status:", response.status);
                 if (!response.ok) {
                     const error = await response.json();
                     throw new Error(error.error || 'Ошибка сохранения');
@@ -152,16 +409,11 @@
                 if (data.role) {
                     currentUserRole = data.role;
                     state = await loadData();
-                    if (state) {
-                        render();
-                        startMessagePolling();
-                    }
+                    if (state) { render(); startMessagePolling(); }
                     return true;
                 }
                 return false;
-            } catch (e) {
-                return false;
-            }
+            } catch (e) { return false; }
         }
 
         async function login(role, password) {
@@ -186,9 +438,7 @@
                 currentUserRole = null;
                 state = null;
                 showLoginModal();
-            } catch (e) {
-                console.error(e);
-            }
+            } catch (e) { console.error(e); }
         }
 
         async function addProposal(proposal) {
@@ -253,9 +503,7 @@
                     if (state) render();
                     setTimeout(() => { messageShown = false; }, 3000);
                 }
-            } catch (e) {
-                console.error(e);
-            }
+            } catch (e) { console.error(e); }
         }
 
         let messageInterval = null;
@@ -266,17 +514,12 @@
             }
         }
 
-        function isOwner() {
-            return currentUserRole === 'owner';
-        }
+        function isOwner() { return currentUserRole === 'owner'; }
 
         function openBlock(name) {
             state.currentBlock = name;
             if (state.blocks[name] && state.blocks[name].kind === 'main') state.lastMain = name;
-            editBlockName = null;
-            editSectionName = null;
-            editMessageIndex = null;
-            inlineProposalIndex = null;
+            editBlockName = null; editSectionName = null; editMessageIndex = null; inlineProposalIndex = null;
             render();
         }
 
@@ -294,8 +537,7 @@
                 if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim()) return;
                 await addProposal({
                     id: Date.now() + Math.random(),
-                    targetType: targetType,
-                    targetName: targetName,
+                    targetType, targetName,
                     blockName: result.f1.trim(),
                     condition: result.f2.trim(),
                     text: result.f3.trim(),
@@ -309,8 +551,7 @@
                 if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim()) return;
                 await addProposal({
                     id: Date.now() + Math.random(),
-                    targetType: targetType,
-                    targetName: targetName,
+                    targetType, targetName,
                     blockName: result.f1.trim(),
                     condition: result.f2.trim(),
                     text: result.f3.trim(),
@@ -324,8 +565,7 @@
                 if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim() || !result.f4.trim()) return;
                 await addProposal({
                     id: Date.now() + Math.random(),
-                    targetType: targetType,
-                    targetName: targetName,
+                    targetType, targetName,
                     sectionName: result.f1.trim(),
                     blockName: result.f2.trim(),
                     condition: result.f3.trim(),
@@ -682,9 +922,8 @@
                 id: Date.now() + Math.random(),
                 targetType: 'block',
                 targetName: state.currentBlock,
-                condition: condition,
-                text: text,
-                attachments: attachments,
+                condition, text,
+                attachments,
                 mode: 'replace',
                 sourceIndex: i
             });
@@ -701,8 +940,7 @@
                 id: Date.now() + Math.random(),
                 targetType: 'block',
                 targetName: state.currentBlock,
-                condition: condition,
-                text: text,
+                condition, text,
                 attachments: []
             });
             document.getElementById('prop-name').value = '';
@@ -712,12 +950,10 @@
 
         // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ВЛОЖЕНИЯМИ ==========
 
-        // Скачать изображение
         function downloadImage(messageIndex, attachmentIndex) {
             const msg = state.blocks[state.currentBlock].messages[messageIndex];
             const att = msg.attachments[attachmentIndex];
             if (!att || att.type !== 'image') return;
-
             const link = document.createElement('a');
             link.href = att.value;
             link.download = `${att.title || 'image'}.png`;
@@ -727,12 +963,10 @@
             alert(`📁 Изображение "${att.title}" скачано!`);
         }
 
-        // Копировать ссылку
         async function copyLink(messageIndex, attachmentIndex) {
             const msg = state.blocks[state.currentBlock].messages[messageIndex];
             const att = msg.attachments[attachmentIndex];
             if (!att || att.type !== 'link') return;
-
             try {
                 await navigator.clipboard.writeText(att.value);
                 alert("🔗 Ссылка скопирована!");
@@ -747,19 +981,15 @@
             }
         }
 
-        // Копировать изображение в буфер обмена
         async function copyImage(messageIndex, attachmentIndex) {
             const msg = state.blocks[state.currentBlock].messages[messageIndex];
             const att = msg.attachments[attachmentIndex];
             if (!att || att.type !== 'image') return;
-
             try {
                 const response = await fetch(att.value);
                 const blob = await response.blob();
                 await navigator.clipboard.write([
-                    new ClipboardItem({
-                        [blob.type]: blob
-                    })
+                    new ClipboardItem({ [blob.type]: blob })
                 ]);
                 alert("✅ Изображение скопировано! Можно вставить (Ctrl+V)");
             } catch (err) {
@@ -768,7 +998,6 @@
             }
         }
 
-        // Удалить вложение
         function removeAttachment(messageIndex, attachmentIndex) {
             const msg = state.blocks[state.currentBlock].messages[messageIndex];
             if (msg.attachments) {
@@ -777,31 +1006,25 @@
             }
         }
 
-        // Отображение вложений
         function renderAttachmentsHtml(msg, i) {
             const assets = msg.attachments || [];
             let html = "<div class='material-row'><button class='small-btn' onclick='toggleAttachmentEditor(" + i + ")'>Материалы</button><div class='drag-handle' draggable='true' data-drag-handle='" + i + "' title='Перетащить'>⋮⋮</div></div>";
             if (assets.length) {
                 html += "<div class='attachments-row'>";
                 assets.forEach((att, idx) => {
+                    const isImage = att.type === 'image';
                     html += "<div class='asset-chip'>";
                     html += "<div class='asset-chip-title'>" + esc(att.title || '') + "</div>";
                     html += "<div class='asset-chip-preview'>";
-                    if (att.type === 'image') {
-                        html += "<img src='" + escAttr(att.value || '') + "'>";
-                    } else {
-                        html += "<div class='asset-chip-link'>" + esc(att.value || '') + "</div>";
-                    }
-                    html += "</div>";
-                    html += "<div class='toolbar' style='margin-top:0'>";
-
-                    if (att.type === 'image') {
+                    if (isImage) html += "<img src='" + escAttr(att.value || '') + "'>";
+                    else html += "<div class='asset-chip-link'>" + esc(att.value || '') + "</div>";
+                    html += "</div><div class='toolbar' style='margin-top:0'>";
+                    if (isImage) {
                         html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='copyImage(" + i + "," + idx + ")'>📋 Копировать</button>";
                         html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='downloadImage(" + i + "," + idx + ")'>💾 Скачать</button>";
                     } else {
                         html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='copyLink(" + i + "," + idx + ")'>🔗 Копировать</button>";
                     }
-
                     html += "<button class='small-btn danger-btn' style='font-size:11px;padding:4px 8px' onclick='removeAttachment(" + i + "," + idx + ")'>🗑 Удалить</button></div>";
                     html += "</div>";
                 });
@@ -812,14 +1035,11 @@
                     + "<div class='asset-editor-grid'>"
                     + "<input id='asset-title-" + i + "' class='input' placeholder='Название'>"
                     + "<select id='asset-type-" + i + "' class='input' onchange='updateAssetFields(" + i + ")'>"
-                    + "<option value='link'>Ссылка</option>"
-                    + "<option value='image'>Фото</option>"
-                    + "</select>"
-                    + "</div>"
+                    + "<option value='link'>Ссылка</option><option value='image'>Фото</option>"
+                    + "</select></div>"
                     + "<div id='asset-fields-" + i + "' style='margin-top:8px'></div>"
                     + "<div class='toolbar'><button class='small-btn gold-btn' onclick='saveAttachment(" + i + ")'>Добавить</button>"
-                    + "<button class='small-btn' onclick='toggleAttachmentEditor(" + i + ")'>Закрыть</button></div>"
-                    + "</div>";
+                    + "<button class='small-btn' onclick='toggleAttachmentEditor(" + i + ")'>Закрыть</button></div></div>";
             }
             return html;
         }
@@ -848,22 +1068,14 @@
         }
 
         async function saveAttachment(messageIndex) {
-            console.log("=== saveAttachment called ===");
-
             const titleEl = document.getElementById('asset-title-' + messageIndex);
             const typeEl = document.getElementById('asset-type-' + messageIndex);
             const valueEl = document.getElementById('asset-value-' + messageIndex);
             const fileEl = document.getElementById('asset-file-' + messageIndex);
-
             const title = (titleEl?.value || '').trim();
             const type = typeEl?.value || 'link';
             let value = (valueEl?.value || '').trim();
-
-            if (!title) {
-                alert("Введите название");
-                return;
-            }
-
+            if (!title) { alert("Введите название"); return; }
             if (type === 'image' && fileEl && fileEl.files && fileEl.files[0]) {
                 const reader = new FileReader();
                 value = await new Promise((resolve) => {
@@ -871,35 +1083,22 @@
                     reader.readAsDataURL(fileEl.files[0]);
                 });
             }
-
-            if (!value) {
-                alert("Введите ссылку или выберите файл");
-                return;
-            }
-
+            if (!value) { alert("Введите ссылку или выберите файл"); return; }
             const msg = state.blocks[state.currentBlock].messages[messageIndex];
             if (!msg.attachments) msg.attachments = [];
             msg.attachments.push({ title, type, value });
-
-            console.log("Attachment added, saving...");
-
             try {
                 const response = await fetch(API_BASE + '/api/data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(state)
                 });
-
-                console.log("Response status:", response.status);
-
                 if (response.ok) {
-                    console.log("Save successful!");
                     assetEditIndex = null;
                     const dataRes = await fetch(API_BASE + '/api/data');
                     state = await dataRes.json();
                     render();
                 } else {
-                    console.error("Save failed with status:", response.status);
                     msg.attachments.pop();
                     renderCenter();
                     alert("Ошибка сохранения: " + response.status);
