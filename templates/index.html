@@ -854,7 +854,8 @@
                     targetName: targetName,
                     blockName: result.f1.trim(),
                     condition: result.f2.trim(),
-                    text: result.f3.trim()
+                    text: result.f3.trim(),
+                    attachments: []
                 });
                 return;
             }
@@ -869,7 +870,8 @@
                     targetName: targetName,
                     blockName: result.f1.trim(),
                     condition: result.f2.trim(),
-                    text: result.f3.trim()
+                    text: result.f3.trim(),
+                    attachments: []
                 });
                 return;
             }
@@ -885,7 +887,8 @@
                     sectionName: result.f1.trim(),
                     blockName: result.f2.trim(),
                     condition: result.f3.trim(),
-                    text: result.f4.trim()
+                    text: result.f4.trim(),
+                    attachments: []
                 });
                 return;
             }
@@ -898,7 +901,8 @@
                 targetType: 'block',
                 targetName: state.currentBlock,
                 condition: result.f1.trim(),
-                text: result.f3.trim()
+                text: result.f3.trim(),
+                attachments: []
             });
         }
 
@@ -1333,12 +1337,18 @@
             const condition = (document.getElementById('inline-name-' + i).value || '').trim();
             const text = (document.getElementById('inline-text-' + i).value || '').trim();
             if (!condition || !text) return;
+
+            // Сохраняем существующие вложения
+            const currentMsg = state.blocks[state.currentBlock].messages[i];
+            const attachments = currentMsg.attachments || [];
+
             await addProposal({
                 id: Date.now() + Math.random(),
                 targetType: 'block',
                 targetName: state.currentBlock,
                 condition: condition,
                 text: text,
+                attachments: attachments, // Передаем вложения
                 mode: 'replace',
                 sourceIndex: i
             });
@@ -1350,12 +1360,18 @@
             const condition = (document.getElementById('prop-name').value || '').trim();
             const text = (document.getElementById('prop-text').value || '').trim();
             if (!condition || !text) return;
+
+            // Получаем текущие вложения из блока
+            const currentBlock = state.blocks[state.currentBlock];
+            const attachments = currentBlock && currentBlock.messages ? currentBlock.messages.map(msg => msg.attachments || []) : [];
+
             await addProposal({
                 id: Date.now() + Math.random(),
                 targetType: 'block',
                 targetName: state.currentBlock,
                 condition: condition,
-                text: text
+                text: text,
+                attachments: [] // Для нового варианта вложения пустые
             });
             render();
         }
@@ -1787,6 +1803,22 @@
                         previewHtml += "<div class='proposal-title'>" + esc(p.condition) + "</div><div class='muted' style='line-height:1.45'>" + esc(p.text) + "</div>";
                     }
                     div.innerHTML = previewHtml;
+                    if (p.attachments && p.attachments.length) {
+                        previewHtml += "<div class='attachments-row' style='margin-top:8px'>";
+                        p.attachments.forEach((att, idx) => {
+                            previewHtml += "<div class='asset-chip' style='width:100%'>";
+                            previewHtml += "<div class='asset-chip-title'>" + esc(att.title || 'Вложение') + "</div>";
+                            previewHtml += "<div class='asset-chip-preview'>";
+                            if (att.type === 'image') {
+                                previewHtml += "<img src='" + escAttr(att.value || '') + "' style='max-width:100px;max-height:60px'>";
+                            } else {
+                                previewHtml += "<div class='asset-chip-link'>" + esc(att.value || '') + "</div>";
+                            }
+                            previewHtml += "</div></div>";
+                        });
+                        previewHtml += "</div>";
+                    }
+
 
                     const tools = document.createElement('div');
                     tools.className = 'toolbar';

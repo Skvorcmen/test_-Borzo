@@ -458,7 +458,7 @@ def delete_proposal(proposal_id):
     return jsonify({"error": "Proposal not found"}), 404
 
 
-@app.route("/api/proposal/<proposal_id>/approve", methods=["POST"])
+@app.route('/api/proposal/<proposal_id>/approve', methods=['POST'])
 @require_owner
 def approve_proposal(proposal_id):
     """Одобрение предложения руководителем"""
@@ -466,104 +466,93 @@ def approve_proposal(proposal_id):
     proposal = None
     proposal_index = None
 
-    for i, p in enumerate(data["proposals"]):
-        if p.get("id") == proposal_id:
+    for i, p in enumerate(data['proposals']):
+        if p.get('id') == proposal_id:
             proposal = p
             proposal_index = i
             break
 
     if not proposal:
-        return jsonify({"error": "Proposal not found"}), 404
+        return jsonify({'error': 'Proposal not found'}), 404
 
-    # Применяем изменения
-    target_type = proposal.get("targetType")
+    target_type = proposal.get('targetType')
+    attachments = proposal.get('attachments', [])
 
-    if target_type == "block":
-        block_name = proposal.get("targetName")
-        if block_name in data["blocks"]:
-            if proposal.get("mode") == "replace" and isinstance(
-                proposal.get("sourceIndex"), int
-            ):
-                messages = data["blocks"][block_name].get("messages", [])
-                if proposal["sourceIndex"] < len(messages):
-                    messages[proposal["sourceIndex"]] = {
-                        "label": proposal.get("condition", ""),
-                        "text": proposal.get("text", ""),
-                        "attachments": messages[proposal["sourceIndex"]].get(
-                            "attachments", []
-                        ),
+    if target_type == 'block':
+        block_name = proposal.get('targetName')
+        if block_name in data['blocks']:
+            if proposal.get('mode') == 'replace' and isinstance(proposal.get('sourceIndex'), int):
+                messages = data['blocks'][block_name].get('messages', [])
+                if proposal['sourceIndex'] < len(messages):
+                    # Сохраняем вложения из предложения
+                    messages[proposal['sourceIndex']] = {
+                        'label': proposal.get('condition', ''),
+                        'text': proposal.get('text', ''),
+                        'attachments': attachments  # Сохраняем вложения
                     }
             else:
-                data["blocks"][block_name]["messages"].append(
-                    {
-                        "label": proposal.get("condition", ""),
-                        "text": proposal.get("text", ""),
-                        "attachments": [],
-                    }
-                )
+                # Добавляем новое сообщение с вложениями
+                data['blocks'][block_name]['messages'].append({
+                    'label': proposal.get('condition', ''),
+                    'text': proposal.get('text', ''),
+                    'attachments': attachments
+                })
 
-    elif target_type == "main-list":
-        block_name = proposal.get("blockName")
-        if block_name and block_name not in data["blocks"]:
-            data["mainOrder"].append(block_name)
-            data["blocks"][block_name] = {
-                "kind": "main",
-                "note": "",
-                "hint": "",
-                "messages": [
-                    {
-                        "label": proposal.get("condition", ""),
-                        "text": proposal.get("text", ""),
-                        "attachments": [],
-                    }
-                ],
+    elif target_type == 'main-list':
+        block_name = proposal.get('blockName')
+        if block_name and block_name not in data['blocks']:
+            data['mainOrder'].append(block_name)
+            data['blocks'][block_name] = {
+                'kind': 'main',
+                'note': '',
+                'hint': '',
+                'messages': [{
+                    'label': proposal.get('condition', ''),
+                    'text': proposal.get('text', ''),
+                    'attachments': attachments
+                }]
             }
 
-    elif target_type == "section":
-        section_name = proposal.get("targetName")
-        block_name = proposal.get("blockName")
-        if block_name and section_name in data["sections"]:
-            if block_name not in data["blocks"]:
-                data["blocks"][block_name] = {
-                    "kind": "side",
-                    "note": "",
-                    "hint": "",
-                    "messages": [
-                        {
-                            "label": proposal.get("condition", ""),
-                            "text": proposal.get("text", ""),
-                            "attachments": [],
-                        }
-                    ],
+    elif target_type == 'section':
+        section_name = proposal.get('targetName')
+        block_name = proposal.get('blockName')
+        if block_name and section_name in data['sections']:
+            if block_name not in data['blocks']:
+                data['blocks'][block_name] = {
+                    'kind': 'side',
+                    'note': '',
+                    'hint': '',
+                    'messages': [{
+                        'label': proposal.get('condition', ''),
+                        'text': proposal.get('text', ''),
+                        'attachments': attachments
+                    }]
                 }
-            if block_name not in data["sections"][section_name]:
-                data["sections"][section_name].append(block_name)
+            if block_name not in data['sections'][section_name]:
+                data['sections'][section_name].append(block_name)
 
-    elif target_type == "new-section":
-        section_name = proposal.get("sectionName")
-        block_name = proposal.get("blockName")
-        if section_name and section_name not in data["sections"]:
-            data["sectionOrder"].append(section_name)
-            data["sections"][section_name] = []
+    elif target_type == 'new-section':
+        section_name = proposal.get('sectionName')
+        block_name = proposal.get('blockName')
+        if section_name and section_name not in data['sections']:
+            data['sectionOrder'].append(section_name)
+            data['sections'][section_name] = []
             if block_name:
-                data["blocks"][block_name] = {
-                    "kind": "side",
-                    "note": "",
-                    "hint": "",
-                    "messages": [
-                        {
-                            "label": proposal.get("condition", ""),
-                            "text": proposal.get("text", ""),
-                            "attachments": [],
-                        }
-                    ],
+                data['blocks'][block_name] = {
+                    'kind': 'side',
+                    'note': '',
+                    'hint': '',
+                    'messages': [{
+                        'label': proposal.get('condition', ''),
+                        'text': proposal.get('text', ''),
+                        'attachments': attachments
+                    }]
                 }
-                data["sections"][section_name].append(block_name)
+                data['sections'][section_name].append(block_name)
 
-    # Удаляем предложение
-    data["proposals"].pop(proposal_index)
+    data['proposals'].pop(proposal_index)
     save_data(data)
-    return jsonify({"success": True})
+    return jsonify({'success': True})
 
 
 @app.route("/api/proposal/<proposal_id>/reject", methods=["POST"])
