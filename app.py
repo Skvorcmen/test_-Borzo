@@ -393,32 +393,15 @@ def check_auth():
     return jsonify({"role": None})
 
 
-@app.route("/api/data", methods=["GET"])
-def get_data():
-    """Получение всех данных"""
-    if "role" not in session:
-        return jsonify({"error": "Unauthorized"}), 401
-    data = load_data()
-    return jsonify(data)
-
-
 @app.route("/api/data", methods=["POST"])
 @require_auth
 def save_data_route():
     """Сохранение данных"""
-    # Разрешаем сохранять для всех, но с ограничениями
     new_data = request.json
+    current_role = session.get("role")
 
-    # Если это менеджер, проверяем, что он меняет только вложения
-    if session.get("role") == "manager":
-        # Получаем текущие данные
-        current_data = load_data()
-
-        # Проверяем, что менеджер меняет только attachments
-        # Это упрощенная проверка - можно усложнить по необходимости
-        pass
-
-    new_data["role"] = session["role"]
+    # Сохраняем данные (разрешаем менеджерам сохранять вложения)
+    new_data["role"] = current_role
     save_data(new_data)
     return jsonify({"success": True})
 
@@ -437,28 +420,6 @@ def add_proposal():
     save_data(data)
     return jsonify({"success": True, "id": proposal["id"]})
 
-@app.route("/api/proposal", methods=["POST"])
-@require_auth
-def add_proposal():
-    """Добавление предложения от менеджера"""
-    if session.get("role") != "manager":
-        return jsonify({"error": "Only managers can create proposals"}), 403
-
-    data = load_data()
-    proposal = request.json
-    proposal["id"] = str(uuid.uuid4())
-
-    # Отладка: выводим вложения в консоль
-    print(f"DEBUG: Received proposal with attachments: {proposal.get('attachments', [])}")
-
-    data["proposals"].insert(0, proposal)
-    save_data(data)
-
-    # Отладка: проверяем что сохранилось
-    saved = load_data()
-    print(f"DEBUG: Saved proposal attachments: {saved['proposals'][0].get('attachments', [])}")
-
-    return jsonify({"success": True, "id": proposal["id"]})
 
 @app.route("/api/proposal/<proposal_id>", methods=["PUT"])
 @require_owner
@@ -507,23 +468,6 @@ def approve_proposal(proposal_id):
 
     target_type = proposal.get('targetType')
     attachments = proposal.get('attachments', [])
-    mode = proposal.get('mode', '')
-    source_index = proposal.get('sourceIndex')
-
-    # Обработка добавления вложения
-    if mode == 'add_attachment' and source_index is not None:
-        block_name = proposal.get('targetName')
-        if block_name in data['blocks']:
-            messages = data['blocks'][block_name].get('messages', [])
-            if source_index < len(messages):
-                if 'attachments' not in messages[source_index]:
-                    messages[source_index]['attachments'] = []
-                # Добавляем вложение
-                for att in attachments:
-                    messages[source_index]['attachments'].append(att)
-                data['proposals'].pop(proposal_index)
-                save_data(data)
-                return jsonify({'success': True})
 
     if target_type == 'block':
         block_name = proposal.get('targetName')
@@ -531,14 +475,12 @@ def approve_proposal(proposal_id):
             if proposal.get('mode') == 'replace' and isinstance(proposal.get('sourceIndex'), int):
                 messages = data['blocks'][block_name].get('messages', [])
                 if proposal['sourceIndex'] < len(messages):
-                    # Сохраняем вложения из предложения
                     messages[proposal['sourceIndex']] = {
                         'label': proposal.get('condition', ''),
                         'text': proposal.get('text', ''),
-                        'attachments': attachments  # Сохраняем вложения
+                        'attachments': attachments
                     }
             else:
-                # Добавляем новое сообщение с вложениями
                 data['blocks'][block_name]['messages'].append({
                     'label': proposal.get('condition', ''),
                     'text': proposal.get('text', ''),
@@ -643,3 +585,4 @@ def get_messages():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
     app.run(debug=False, host="0.0.0.0", port=port)
+
