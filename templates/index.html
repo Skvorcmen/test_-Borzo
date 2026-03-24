@@ -700,13 +700,19 @@
                     messages.forEach((msg, i) => {
                         if (msg.attachments && msg.attachments.length) {
                             console.log(`DEBUG: Message ${i} has ${msg.attachments.length} attachments`);
+                            msg.attachments.forEach((att, j) => {
+                                console.log(`  Attachment ${j}: ${att.title} (${att.type})`);
+                            });
                         }
                     });
                 }
 
                 const response = await fetch(API_BASE + '/api/data', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
                     body: JSON.stringify(data)
                 });
 
@@ -950,12 +956,20 @@
         }
 
         async function saveDataAndRender() {
-            console.log("Saving data...");
+            console.log("saveDataAndRender called");
             const success = await saveData(state);
             if (success) {
-                console.log("Data saved, reloading...");
-                state = await loadData();
+                console.log("Save successful, reloading data from server...");
+                // Принудительно перезагружаем данные с сервера
+                const response = await fetch(API_BASE + '/api/data', {
+                    cache: 'no-store',
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
+                state = await response.json();
+                console.log("Data reloaded from server");
                 render();
+            } else {
+                console.log("Save failed");
             }
         }
 
@@ -1512,6 +1526,8 @@
         }
 
         async function saveAttachment(messageIndex) {
+            console.log("=== saveAttachment called for message", messageIndex);
+
             const titleEl = document.getElementById('asset-title-' + messageIndex);
             const typeEl = document.getElementById('asset-type-' + messageIndex);
             const valueEl = document.getElementById('asset-value-' + messageIndex);
@@ -1521,23 +1537,34 @@
             const type = typeEl?.value || 'link';
             let value = (valueEl?.value || '').trim();
 
-            if (!title) return;
-
-            if (type === 'image' && fileEl && fileEl.files && fileEl.files[0]) {
-                value = await readFileAsDataURL(fileEl.files[0]);
+            if (!title) {
+                alert("Введите название");
+                return;
             }
 
-            if (!value) return;
+            if (type === 'image' && fileEl && fileEl.files && fileEl.files[0]) {
+                console.log("Reading image file...");
+                value = await readFileAsDataURL(fileEl.files[0]);
+                console.log("Image loaded, length:", value.length);
+            }
+
+            if (!value) {
+                alert("Введите ссылку или выберите файл");
+                return;
+            }
 
             const msg = state.blocks[state.currentBlock].messages[messageIndex];
             if (!msg.attachments) msg.attachments = [];
             msg.attachments.push({ title, type, value });
 
-            console.log("DEBUG: Attachment added, total attachments:", msg.attachments.length);
-            console.log("DEBUG: Current state before save:", JSON.stringify(state.blocks[state.currentBlock].messages[messageIndex].attachments));
+            console.log("Attachment added, total attachments:", msg.attachments.length);
+            console.log("Current user role:", currentUserRole);
 
             // Сохраняем
             await saveDataAndRender();
+
+            // Закрываем редактор
+            assetEditIndex = null;
         }
 
         function removeAttachment(messageIndex, attachmentIndex) {
