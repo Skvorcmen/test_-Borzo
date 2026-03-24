@@ -1402,7 +1402,9 @@
                         html += "<div class='asset-chip-link'>" + esc(att.value || '') + "</div>";
                     }
                     html += "</div>";
-                    html += "<div class='toolbar' style='margin-top:0'><button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='copyAttachment(" + i + "," + idx + ")'>Копировать</button><button class='small-btn danger-btn' style='font-size:11px;padding:4px 8px' onclick='removeAttachment(" + i + "," + idx + ")'>Удалить</button></div>";
+                    // Кнопки для всех пользователей (и менеджер, и руководитель)
+                    html += "<div class='toolbar' style='margin-top:0'><button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='copyAttachment(" + i + "," + idx + ")'>Копировать</button>";
+                    html += "<button class='small-btn danger-btn' style='font-size:11px;padding:4px 8px' onclick='removeAttachment(" + i + "," + idx + ")'>Удалить</button></div>";
                     html += "</div>";
                 });
                 html += "</div>";
@@ -1491,7 +1493,7 @@
             const msg = state.blocks[state.currentBlock].messages[messageIndex];
             if (msg.attachments) {
                 msg.attachments.splice(attachmentIndex, 1);
-                saveDataAndRender();
+                saveDataAndRender();  // Эта функция теперь сохраняет для всех
             }
         }
 
