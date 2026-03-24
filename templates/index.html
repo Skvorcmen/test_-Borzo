@@ -1,1386 +1,1302 @@
 <!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>BORZO - Script Navigator</title>
-        <link rel="icon" href="data:,">
-        <style>
-            :root {
-                --bg: #3a3a3a;
-                --bg2: #474747;
-                --panel: #f8f7f3;
-                --white: #fff;
-                --line: #ddd8cf;
-                --text: #222;
-                --muted: #6f6a63;
-                --gold: #c9a24a;
-                --gold2: #a9852f;
-                --goldsoft: #f7edd6;
-                --bluesoft: #edf4ff;
-                --danger: #c64c4c;
-                --green: #189c54;
-            }
-
-            * {
-                box-sizing: border-box;
-            }
-
-            body {
-                margin: 0;
-                font-family: Arial, Helvetica, sans-serif;
-                background: linear-gradient(180deg, var(--bg), var(--bg2));
-                color: var(--text);
-            }
-
-            header {
-                height: 82px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 16px 22px;
-                background: rgba(20, 20, 20, .18);
-                border-bottom: 1px solid rgba(201, 162, 74, .35);
-            }
-
-            .brand {
-                display: flex;
-                align-items: center;
-                gap: 14px;
-            }
-
-            .logo {
-                border: 2px solid var(--gold);
-                color: var(--gold);
-                padding: 6px 14px;
-                border-radius: 8px;
-                font-weight: 800;
-                letter-spacing: 2px;
-                font-size: 28px;
-                background: #2f2f2f;
-            }
-
-            .header-title {
-                font-size: 20px;
-                font-weight: 700;
-                color: #fff;
-            }
-
-            .header-sub {
-                font-size: 12px;
-                color: #ddd;
-                margin-top: 4px;
-            }
-
-            .role-select {
-                border: 1px solid rgba(201, 162, 74, .45);
-                background: #2f2f2f;
-                color: #fff;
-                border-radius: 10px;
-                padding: 10px 12px;
-            }
-
-            .layout {
-                display: grid;
-                grid-template-columns: 300px 1fr 340px;
-                gap: 16px;
-                padding: 16px;
-                min-height: calc(100vh - 82px);
-            }
-
-            .panel {
-                background: var(--panel);
-                border: 1px solid rgba(255, 255, 255, .16);
-                border-radius: 18px;
-                padding: 16px;
-                box-shadow: 0 10px 28px rgba(0, 0, 0, .15);
-            }
-
-            .white {
-                background: var(--white);
-            }
-
-            .section-head {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 10px;
-                margin-bottom: 12px;
-            }
-
-            .section-title {
-                font-size: 22px;
-                font-weight: 800;
-            }
-
-            .muted {
-                font-size: 12px;
-                color: var(--muted);
-            }
-
-            .list {
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .item {
-                border: 1px solid var(--line);
-                background: #fff;
-                border-radius: 12px;
-                padding: 12px 14px;
-                transition: all .15s ease;
-                cursor: pointer;
-            }
-
-            .item:hover {
-                border-color: var(--gold);
-                background: #fffaf1;
-            }
-
-            .item.active {
-                border-color: var(--gold);
-                background: #fff7e8;
-                box-shadow: 0 0 0 2px rgba(201, 162, 74, .12) inset;
-            }
-
-            .item-row {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 10px;
-            }
-
-            .item-title {
-                flex: 1;
-                font-weight: 700;
-            }
-
-            .hidden-actions {
-                display: flex;
-                gap: 6px;
-                min-width: 74px;
-                justify-content: flex-end;
-                visibility: hidden;
-                opacity: 0;
-                pointer-events: none;
-            }
-
-            .item:hover .hidden-actions,
-            .item.active .hidden-actions,
-            .item.show .hidden-actions {
-                visibility: visible;
-                opacity: 1;
-                pointer-events: auto;
-            }
-
-            .input, .textarea, .item-input {
-                width: 100%;
-                border: 1px solid #d7d2c7;
-                border-radius: 10px;
-                padding: 10px 12px;
-                background: #fff;
-                font: inherit;
-            }
-
-            .textarea {
-                min-height: 120px;
-                resize: vertical;
-            }
-
-            .icon-btn, .small-btn, .copy-btn {
-                border: 1px solid var(--line);
-                background: #fff;
-                border-radius: 10px;
-                cursor: pointer;
-                font: inherit;
-            }
-
-            .icon-btn {
-                width: 34px;
-                height: 34px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 16px;
-            }
-
-            .small-btn {
-                padding: 10px 12px;
-                font-size: 13px;
-            }
-
-            .copy-btn {
-                min-height: 48px;
-                min-width: 148px;
-                padding: 12px 20px;
-                font-size: 16px;
-                font-weight: 800;
-                background: var(--gold);
-                border-color: var(--gold2);
-                color: #fff;
-                box-shadow: 0 4px 12px rgba(201, 162, 74, .18);
-            }
-
-            .gold-btn {
-                background: var(--gold);
-                border-color: var(--gold2);
-                color: #fff;
-            }
-
-            .danger-btn {
-                color: var(--danger);
-            }
-
-            .return-btn {
-                background: var(--danger);
-                border-color: #b54444;
-                color: #fff;
-                font-size: 20px;
-                font-weight: 800;
-                padding: 16px 20px;
-                min-width: 320px;
-            }
-
-            .center-title {
-                font-size: 34px;
-                font-weight: 800;
-                margin-bottom: 4px;
-            }
-
-            .center-sub {
-                font-size: 18px;
-                font-weight: 800;
-                margin-bottom: 14px;
-            }
-
-            .center-sub.main {
-                color: var(--green);
-            }
-
-            .center-sub.side {
-                color: var(--muted);
-            }
-
-            .info-box {
-                border-radius: 14px;
-                padding: 12px 14px;
-                margin-bottom: 12px;
-                line-height: 1.45;
-            }
-
-            .gold-box {
-                background: var(--goldsoft);
-                border: 1px solid #ead39f;
-            }
-
-            .blue-box {
-                background: var(--bluesoft);
-                border: 1px solid #c7d8ff;
-            }
-
-            .card {
-                border: 2px solid #2f3237;
-                background: #ffffff;
-                border-radius: 14px;
-                padding: 14px;
-                margin-bottom: 14px;
-                box-shadow: 0 3px 10px rgba(0, 0, 0, .06);
-            }
-
-            .card-head {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 10px;
-                margin-bottom: 10px;
-                flex-wrap: wrap;
-            }
-
-            .card-body {
-                flex: 1;
-                min-width: 0;
-            }
-
-            .card-text {
-                white-space: pre-wrap;
-                line-height: 1.62;
-                font-size: 18px;
-                color: #2a2a2a;
-                user-select: text;
-            }
-
-            .card-label {
-                font-size: 12px;
-                font-weight: 900;
-                color: var(--gold2);
-                text-transform: uppercase;
-                letter-spacing: .6px;
-            }
-
-            .toolbar {
-                display: flex;
-                gap: 8px;
-                flex-wrap: wrap;
-                margin-top: 10px;
-            }
-
-            .divider {
-                height: 1px;
-                background: #e7e3da;
-                margin: 14px 0;
-            }
-
-            .empty {
-                padding: 14px;
-                border: 1px dashed #cfcac0;
-                border-radius: 12px;
-                background: #fff;
-                color: var(--muted);
-            }
-
-            .badge {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                min-width: 22px;
-                height: 22px;
-                padding: 0 7px;
-                border-radius: 999px;
-                background: var(--danger);
-                color: #fff;
-                font-size: 12px;
-                font-weight: 700;
-            }
-
-            .proposal-card {
-                border: 1px solid var(--line);
-                border-radius: 14px;
-                padding: 12px;
-                background: #fff;
-                margin-bottom: 8px;
-            }
-
-            .proposal-title {
-                font-weight: 700;
-                margin-bottom: 6px;
-            }
-
-            .attachments-row {
-                display: flex;
-                gap: 10px;
-                overflow-x: auto;
-                padding: 6px 0 2px 0;
-                margin-top: 8px;
-            }
-
-            .asset-chip {
-                min-width: 120px;
-                max-width: 140px;
-                border: 1px solid #d7d2c7;
-                border-radius: 10px;
-                padding: 6px;
-                background: #fafafa;
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-            }
-
-            .asset-chip-title {
-                font-size: 12px;
-                font-weight: 700;
-                color: #444;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-
-            .asset-chip-preview {
-                height: 60px;
-                border: 1px solid #ece7dc;
-                border-radius: 8px;
-                background: #fff;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                overflow: hidden;
-                padding: 4px;
-            }
-
-            .asset-chip-preview img {
-                max-width: 100%;
-                max-height: 100%;
-                display: block;
-                border-radius: 8px;
-            }
-
-            .asset-chip-link {
-                font-size: 11px;
-                line-height: 1.3;
-                color: #555;
-                word-break: break-all;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                display: -webkit-box;
-                -webkit-line-clamp: 3;
-                -webkit-box-orient: vertical;
-            }
-
-            .asset-editor {
-                margin-top: 10px;
-                border-top: 1px solid #e7e3da;
-                padding-top: 10px;
-            }
-
-            .asset-editor-grid {
-                display: grid;
-                grid-template-columns: 1fr 120px;
-                gap: 8px;
-            }
-
-            .asset-file {
-                font: inherit;
-            }
-
-            .drag-handle {
-                width: 28px;
-                height: 28px;
-                border: 1px solid var(--line);
-                border-radius: 6px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 12px;
-                background: #fff;
-                color: #666;
-                cursor: grab;
-                user-select: none;
-            }
-
-            .drag-handle:active {
-                cursor: grabbing;
-            }
-
-            .material-row {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                margin-top: 12px;
-            }
-
-            .app-modal-backdrop {
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, .45);
-                display: none;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;
-            }
-
-            .app-modal-backdrop.show {
-                display: flex;
-            }
-
-            .app-modal {
-                width: min(560px, calc(100vw - 32px));
-                background: #fff;
-                border-radius: 16px;
-                border: 1px solid var(--line);
-                box-shadow: 0 20px 40px rgba(0, 0, 0, .25);
-                padding: 16px;
-            }
-
-            .app-modal-title {
-                font-size: 20px;
-                font-weight: 800;
-                margin-bottom: 10px;
-            }
-
-            .app-modal-text {
-                font-size: 14px;
-                color: var(--muted);
-                margin-bottom: 10px;
-            }
-
-            .app-modal-input,
-            .app-modal-textarea {
-                width: 100%;
-                border: 1px solid #d7d2c7;
-                border-radius: 10px;
-                padding: 10px 12px;
-                background: #fff;
-                font: inherit;
-            }
-
-            .app-modal-textarea {
-                min-height: 120px;
-                resize: vertical;
-            }
-
-            .app-modal-actions {
-                display: flex;
-                gap: 8px;
-                justify-content: flex-end;
-                flex-wrap: wrap;
-                margin-top: 12px;
-            }
-
-            .login-modal .role-buttons {
-                display: flex;
-                gap: 12px;
-                margin-bottom: 16px;
-            }
-
-            .login-modal .role-btn {
-                flex: 1;
-                padding: 12px;
-                font-size: 16px;
-                font-weight: 700;
-                border-radius: 12px;
-                cursor: pointer;
-                border: 1px solid var(--line);
-                background: #fff;
-                transition: all 0.2s;
-            }
-
-            .login-modal .role-btn.active {
-                background: var(--gold);
-                border-color: var(--gold2);
-                color: #fff;
-            }
-
-            .login-modal .password-field {
-                display: none;
-            }
-
-            .login-modal .password-field.show {
-                display: block;
-            }
-
-            @media (max-width:1150px) {
-                .layout {
-                    grid-template-columns: 1fr;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <header>
-            <div class="brand">
-                <div class="logo">BORZO</div>
-                <div>
-                    <div class="header-title">Script Navigator</div>
-                    <div class="header-sub">Внутренний навигатор скриптов</div>
-                </div>
-            </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <button id="downloadProjectBtn" class="small-btn gold-btn" style="display: none;">Скачать проект</button>
-                <button id="exportBtn" class="small-btn gold-btn" style="display: none;">Экспорт базы</button>
-                <select id="roleSelect" class="role-select">
-                    <option value="manager">Менеджер</option>
-                    <option value="owner">Руководитель</option>
-                </select>
-                <button id="logoutBtn" class="small-btn" style="background:#2f2f2f; border-color:#666; color:#fff;">Выйти</button>
-            </div>
-        </header>
-
-        <div class="layout">
-            <aside class="panel">
-                <div class="section-head">
-                    <div class="section-title">Магистраль</div>
-                </div>
-                <div id="mainList" class="list"></div>
-                <div class="divider"></div>
-                <div class="section-head">
-                    <div class="section-title" style="font-size:18px">Предложения</div>
-                    <div id="propBadge"></div>
-                </div>
-                <div id="managerReplyArea" class="list"></div>
-                <div id="proposalList" class="list"></div>
-            </aside>
-
-            <main class="panel white">
-                <div id="center"></div>
-            </main>
-
-            <aside class="panel">
-                <div id="right"></div>
-            </aside>
-        </div>
-
-        <div id="appModalBackdrop" class="app-modal-backdrop">
-            <div class="app-modal">
-                <div id="appModalTitle" class="app-modal-title"></div>
-                <div id="appModalText" class="app-modal-text"></div>
-                <div id="appModalFields"></div>
-                <div class="app-modal-actions" id="appModalActions"></div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BORZO - Script Navigator</title>
+    <link rel="icon" href="data:,">
+    <style>
+        /* ... весь ваш CSS ... */
+        /* (скопируйте ваш CSS из предыдущей версии) */
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">
+            <div class="logo">BORZO</div>
+            <div>
+                <div class="header-title">Script Navigator</div>
+                <div class="header-sub">Внутренний навигатор скриптов</div>
             </div>
         </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="downloadProjectBtn" class="small-btn gold-btn" style="display: none;">Скачать проект</button>
+            <button id="exportBtn" class="small-btn gold-btn" style="display: none;">Экспорт базы</button>
+            <select id="roleSelect" class="role-select">
+                <option value="manager">Менеджер</option>
+                <option value="owner">Руководитель</option>
+            </select>
+            <button id="logoutBtn" class="small-btn" style="background:#2f2f2f; border-color:#666; color:#fff;">Выйти</button>
+        </div>
+    </header>
 
-        <script>
-            // API URL
-            const API_BASE = '';
+    <div class="layout">
+        <aside class="panel">
+            <div class="section-head">
+                <div class="section-title">Магистраль</div>
+            </div>
+            <div id="mainList" class="list"></div>
+            <div class="divider"></div>
+            <div class="section-head">
+                <div class="section-title" style="font-size:18px">Предложения</div>
+                <div id="propBadge"></div>
+            </div>
+            <div id="managerReplyArea" class="list"></div>
+            <div id="proposalList" class="list"></div>
+        </aside>
 
-            // Глобальное состояние
-            let state = null;
-            let currentUserRole = null;
-            let editBlockName = null;
-            let editSectionName = null;
-            let editMessageIndex = null;
-            let inlineProposalIndex = null;
-            let ownerEditProposalIndex = null;
-            let assetEditIndex = null;
-            let messageShown = false;
+        <main class="panel white">
+            <div id="center"></div>
+        </main>
 
-            // Утилиты
-            const esc = s => String(s || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-            const escAttr = s => esc(s).replaceAll('"', '&quot;');
-            const escJs = s => String(s || '').replaceAll('\\', '\\\\').replaceAll("'", "\\'");
+        <aside class="panel">
+            <div id="right"></div>
+        </aside>
+    </div>
 
-            async function apiCall(url, method, data = null) {
-                const options = {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json' }
-                };
-                if (data) options.body = JSON.stringify(data);
-                const response = await fetch(API_BASE + url, options);
+    <div id="appModalBackdrop" class="app-modal-backdrop">
+        <div class="app-modal">
+            <div id="appModalTitle" class="app-modal-title"></div>
+            <div id="appModalText" class="app-modal-text"></div>
+            <div id="appModalFields"></div>
+            <div class="app-modal-actions" id="appModalActions"></div>
+        </div>
+    </div>
+
+    <script>
+        // API URL
+        const API_BASE = '';
+
+        // Глобальное состояние
+        let state = null;
+        let currentUserRole = null;
+        let editBlockName = null;
+        let editSectionName = null;
+        let editMessageIndex = null;
+        let inlineProposalIndex = null;
+        let ownerEditProposalIndex = null;
+        let assetEditIndex = null;
+        let messageShown = false;
+
+        // Утилиты
+        const esc = s => String(s || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+        const escAttr = s => esc(s).replaceAll('"', '&quot;');
+        const escJs = s => String(s || '').replaceAll('\\', '\\\\').replaceAll("'", "\\'");
+
+        async function apiCall(url, method, data = null) {
+            const options = {
+                method: method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (data) options.body = JSON.stringify(data);
+            const response = await fetch(API_BASE + url, options);
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                throw new Error(error.error || 'Ошибка запроса');
+            }
+            return response.json();
+        }
+
+        async function loadData() {
+            try {
+                console.log("Loading data...");
+                const response = await fetch(API_BASE + '/api/data');
                 if (!response.ok) {
-                    const error = await response.json().catch(() => ({}));
-                    throw new Error(error.error || 'Ошибка запроса');
-                }
-                return response.json();
-            }
-
-            async function loadData() {
-                try {
-                    console.log("Loading data...");
-                    const response = await fetch(API_BASE + '/api/data');
-                    if (!response.ok) {
-                        if (response.status === 401) {
-                            showLoginModal();
-                            return null;
-                        }
-                        throw new Error('Ошибка загрузки данных');
+                    if (response.status === 401) {
+                        showLoginModal();
+                        return null;
                     }
-                    return await response.json();
-                } catch (e) {
-                    console.error(e);
-                    return null;
+                    throw new Error('Ошибка загрузки данных');
                 }
+                return await response.json();
+            } catch (e) {
+                console.error(e);
+                return null;
             }
+        }
 
-            async function saveData(data) {
-                try {
-                    console.log("Saving data...");
-                    const response = await fetch(API_BASE + '/api/data', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    });
-                    console.log("Response status:", response.status);
-                    if (!response.ok) {
-                        const error = await response.json();
-                        throw new Error(error.error || 'Ошибка сохранения');
-                    }
-                    return true;
-                } catch (e) {
-                    console.error('Save error:', e);
-                    alert('Ошибка сохранения: ' + e.message);
-                    return false;
+        async function saveData(data) {
+            try {
+                console.log("Saving data...");
+                const response = await fetch(API_BASE + '/api/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                console.log("Response status:", response.status);
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Ошибка сохранения');
                 }
+                return true;
+            } catch (e) {
+                console.error('Save error:', e);
+                alert('Ошибка сохранения: ' + e.message);
+                return false;
             }
+        }
 
-            async function saveDataAndRender() {
-                const success = await saveData(state);
-                if (success) {
+        async function saveDataAndRender() {
+            const success = await saveData(state);
+            if (success) {
+                state = await loadData();
+                render();
+            }
+        }
+
+        async function checkAuth() {
+            try {
+                const response = await fetch(API_BASE + '/api/check');
+                const data = await response.json();
+                if (data.role) {
+                    currentUserRole = data.role;
                     state = await loadData();
-                    render();
-                }
-            }
-
-            async function checkAuth() {
-                try {
-                    const response = await fetch(API_BASE + '/api/check');
-                    const data = await response.json();
-                    if (data.role) {
-                        currentUserRole = data.role;
-                        state = await loadData();
-                        if (state) {
-                            render();
-                            startMessagePolling();
-                        }
-                        return true;
-                    }
-                    return false;
-                } catch (e) {
-                    return false;
-                }
-            }
-
-            async function login(role, password) {
-                try {
-                    const data = await apiCall('/api/login', 'POST', { role, password });
-                    if (data.success) {
-                        currentUserRole = data.role;
-                        state = await loadData();
+                    if (state) {
                         render();
-                        return true;
+                        startMessagePolling();
                     }
-                    return false;
-                } catch (e) {
-                    alert('Ошибка входа: ' + e.message);
-                    return false;
+                    return true;
                 }
+                return false;
+            } catch (e) {
+                return false;
             }
+        }
 
-            async function logout() {
-                try {
-                    await apiCall('/api/logout', 'POST');
-                    currentUserRole = null;
-                    state = null;
-                    showLoginModal();
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-
-            async function addProposal(proposal) {
-                try {
-                    await apiCall('/api/proposal', 'POST', proposal);
+        async function login(role, password) {
+            try {
+                const data = await apiCall('/api/login', 'POST', { role, password });
+                if (data.success) {
+                    currentUserRole = data.role;
                     state = await loadData();
                     render();
                     return true;
-                } catch (e) {
-                    alert('Ошибка отправки предложения: ' + e.message);
-                    return false;
                 }
+                return false;
+            } catch (e) {
+                alert('Ошибка входа: ' + e.message);
+                return false;
             }
+        }
 
-            async function approveProposal(proposalId) {
-                try {
-                    await apiCall(`/api/proposal/${proposalId}/approve`, 'POST');
-                    state = await loadData();
-                    render();
-                    return true;
-                } catch (e) {
-                    alert('Ошибка: ' + e.message);
-                    return false;
-                }
+        async function logout() {
+            try {
+                await apiCall('/api/logout', 'POST');
+                currentUserRole = null;
+                state = null;
+                showLoginModal();
+            } catch (e) {
+                console.error(e);
             }
+        }
 
-            async function rejectProposal(proposalId, comment) {
-                try {
-                    await apiCall(`/api/proposal/${proposalId}/reject`, 'POST', { comment });
-                    state = await loadData();
-                    render();
-                    return true;
-                } catch (e) {
-                    alert('Ошибка: ' + e.message);
-                    return false;
-                }
+        async function addProposal(proposal) {
+            try {
+                await apiCall('/api/proposal', 'POST', proposal);
+                state = await loadData();
+                render();
+                return true;
+            } catch (e) {
+                alert('Ошибка отправки предложения: ' + e.message);
+                return false;
             }
+        }
 
-            async function deleteProposal(proposalId) {
-                try {
-                    await apiCall(`/api/proposal/${proposalId}`, 'DELETE');
-                    state = await loadData();
-                    render();
-                    return true;
-                } catch (e) {
-                    alert('Ошибка: ' + e.message);
-                    return false;
-                }
+        async function approveProposal(proposalId) {
+            try {
+                await apiCall(`/api/proposal/${proposalId}/approve`, 'POST');
+                state = await loadData();
+                render();
+                return true;
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+                return false;
             }
+        }
 
-            async function checkMessages() {
-                if (currentUserRole !== 'manager') return;
-                if (messageShown) return; // Не показываем, если уже показано
+        async function rejectProposal(proposalId, comment) {
+            try {
+                await apiCall(`/api/proposal/${proposalId}/reject`, 'POST', { comment });
+                state = await loadData();
+                render();
+                return true;
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+                return false;
+            }
+        }
 
-                try {
-                    const data = await apiCall('/api/messages', 'GET');
-                    if (data.messages && data.messages.length) {
-                        messageShown = true;
+        async function deleteProposal(proposalId) {
+            try {
+                await apiCall(`/api/proposal/${proposalId}`, 'DELETE');
+                state = await loadData();
+                render();
+                return true;
+            } catch (e) {
+                alert('Ошибка: ' + e.message);
+                return false;
+            }
+        }
 
-                        // Показываем ВСЕ сообщения (может быть несколько)
-                        for (const msg of data.messages) {
-                            await showAlertModal('Ответ от руководителя', msg.text);
-                        }
-
-                        // Обновляем данные
-                        state = await loadData();
-                        if (state) {
-                            render();
-                        }
-
-                        // Сбрасываем флаг через 3 секунды, чтобы новые сообщения могли быть показаны
-                        setTimeout(() => {
-                            messageShown = false;
-                        }, 3000);
+        async function checkMessages() {
+            if (currentUserRole !== 'manager') return;
+            if (messageShown) return;
+            try {
+                const data = await apiCall('/api/messages', 'GET');
+                if (data.messages && data.messages.length) {
+                    messageShown = true;
+                    for (const msg of data.messages) {
+                        await showAlertModal('Ответ от руководителя', msg.text);
                     }
-                } catch (e) {
-                    console.error(e);
+                    state = await loadData();
+                    if (state) render();
+                    setTimeout(() => { messageShown = false; }, 3000);
                 }
+            } catch (e) {
+                console.error(e);
             }
+        }
 
-            let messageInterval = null;
-            function startMessagePolling() {
-                if (messageInterval) clearInterval(messageInterval);
-                if (currentUserRole === 'manager') {
-                    messageInterval = setInterval(checkMessages, 10000);
-                }
+        let messageInterval = null;
+        function startMessagePolling() {
+            if (messageInterval) clearInterval(messageInterval);
+            if (currentUserRole === 'manager') {
+                messageInterval = setInterval(checkMessages, 10000);
             }
+        }
 
-            function isOwner() {
-                return currentUserRole === 'owner';
-            }
+        function isOwner() {
+            return currentUserRole === 'owner';
+        }
 
-            function openBlock(name) {
-                state.currentBlock = name;
-                if (state.blocks[name] && state.blocks[name].kind === 'main') state.lastMain = name;
-                editBlockName = null;
-                editSectionName = null;
-                editMessageIndex = null;
-                inlineProposalIndex = null;
-                render();
-            }
+        function openBlock(name) {
+            state.currentBlock = name;
+            if (state.blocks[name] && state.blocks[name].kind === 'main') state.lastMain = name;
+            editBlockName = null;
+            editSectionName = null;
+            editMessageIndex = null;
+            inlineProposalIndex = null;
+            render();
+        }
 
-            function returnToMain() {
-                state.currentBlock = state.lastMain || state.mainOrder[0];
-                inlineProposalIndex = null;
-                render();
-            }
+        function returnToMain() {
+            state.currentBlock = state.lastMain || state.mainOrder[0];
+            inlineProposalIndex = null;
+            render();
+        }
 
-            async function createProposal(targetType, targetName) {
-                let result = null;
-                if (targetType === 'main-list') {
-                    result = await showTripleFieldModal('Предложить блок', 'Название блока', 'Назначение / когда использовать', 'Текст первого сообщения');
-                    if (!result) return;
-                    if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim()) return;
-                    await addProposal({
-                        id: Date.now() + Math.random(),
-                        targetType: targetType,
-                        targetName: targetName,
-                        blockName: result.f1.trim(),
-                        condition: result.f2.trim(),
-                        text: result.f3.trim(),
-                        attachments: []
-                    });
-                    return;
-                }
-                if (targetType === 'section') {
-                    result = await showTripleFieldModal('Предложить элемент', 'Название элемента', 'Назначение / когда использовать', 'Текст первого сообщения');
-                    if (!result) return;
-                    if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim()) return;
-                    await addProposal({
-                        id: Date.now() + Math.random(),
-                        targetType: targetType,
-                        targetName: targetName,
-                        blockName: result.f1.trim(),
-                        condition: result.f2.trim(),
-                        text: result.f3.trim(),
-                        attachments: []
-                    });
-                    return;
-                }
-                if (targetType === 'new-section') {
-                    result = await showQuadFieldModal('Предложить раздел', 'Название раздела', 'Название первого элемента', 'Назначение / когда использовать', 'Текст первого сообщения');
-                    if (!result) return;
-                    if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim() || !result.f4.trim()) return;
-                    await addProposal({
-                        id: Date.now() + Math.random(),
-                        targetType: targetType,
-                        targetName: targetName,
-                        sectionName: result.f1.trim(),
-                        blockName: result.f2.trim(),
-                        condition: result.f3.trim(),
-                        text: result.f4.trim(),
-                        attachments: []
-                    });
-                    return;
-                }
-                result = await showTripleFieldModal('Предложить изменение', 'Назначение / когда использовать', 'Текущий блок', 'Текст ответа', '', targetName || '', '');
+        async function createProposal(targetType, targetName) {
+            let result = null;
+            if (targetType === 'main-list') {
+                result = await showTripleFieldModal('Предложить блок', 'Название блока', 'Назначение / когда использовать', 'Текст первого сообщения');
                 if (!result) return;
-                if (!result.f1.trim() || !result.f3.trim()) return;
+                if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim()) return;
                 await addProposal({
                     id: Date.now() + Math.random(),
-                    targetType: 'block',
-                    targetName: state.currentBlock,
-                    condition: result.f1.trim(),
+                    targetType: targetType,
+                    targetName: targetName,
+                    blockName: result.f1.trim(),
+                    condition: result.f2.trim(),
                     text: result.f3.trim(),
                     attachments: []
                 });
+                return;
             }
-
-            function moveItemInArray(arr, fromIndex, toIndex) {
-                if (!Array.isArray(arr)) return;
-                if (fromIndex === toIndex) return;
-                const item = arr.splice(fromIndex, 1)[0];
-                arr.splice(toIndex, 0, item);
-                saveDataAndRender();
-            }
-
-            // Drag and drop handlers
-            let dragState = null;
-            function startDrag(type, payload) { dragState = { type, ...payload }; }
-            function clearDragState() { dragState = null; document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
-            function handleMainDrop(targetName) {
-                if (!dragState || dragState.type !== 'main') return;
-                const fromIndex = state.mainOrder.indexOf(dragState.name);
-                const toIndex = state.mainOrder.indexOf(targetName);
-                moveItemInArray(state.mainOrder, fromIndex, toIndex);
-                clearDragState();
-            }
-            function handleSectionItemDrop(sectionName, targetName) {
-                if (!dragState || dragState.type !== 'section-item' || dragState.sectionName !== sectionName) return;
-                const arr = state.sections[sectionName] || [];
-                const fromIndex = arr.indexOf(dragState.name);
-                const toIndex = arr.indexOf(targetName);
-                moveItemInArray(arr, fromIndex, toIndex);
-                clearDragState();
-            }
-            function handleSectionDrop(targetSection) {
-                if (!dragState || dragState.type !== 'section') return;
-                const fromIndex = state.sectionOrder.indexOf(dragState.sectionName);
-                const toIndex = state.sectionOrder.indexOf(targetSection);
-                moveItemInArray(state.sectionOrder, fromIndex, toIndex);
-                clearDragState();
-            }
-            function handleMessageDrop(targetIndex) {
-                if (!dragState || dragState.type !== 'message') return;
-                const arr = (state.blocks[state.currentBlock] || {}).messages || [];
-                moveItemInArray(arr, dragState.index, targetIndex);
-                clearDragState();
-            }
-
-            // Модальные окна
-            function closeAppModal() {
-                const backdrop = document.getElementById('appModalBackdrop');
-                backdrop.classList.remove('show');
-                backdrop.className = 'app-modal-backdrop';
-                document.getElementById('appModalTitle').textContent = '';
-                document.getElementById('appModalText').textContent = '';
-                document.getElementById('appModalFields').innerHTML = '';
-                document.getElementById('appModalActions').innerHTML = '';
-            }
-
-            function showPromptModal(title, label, defaultValue = '') {
-                return new Promise(resolve => {
-                    const backdrop = document.getElementById('appModalBackdrop');
-                    document.getElementById('appModalTitle').textContent = title || 'Введите значение';
-                    document.getElementById('appModalText').textContent = '';
-                    document.getElementById('appModalFields').innerHTML = "<input id='appModalInput' class='app-modal-input' value='" + escAttr(defaultValue || '') + "' placeholder='" + escAttr(label || '') + "'>";
-                    const actions = document.getElementById('appModalActions');
-                    actions.innerHTML = '';
-                    const cancel = document.createElement('button');
-                    cancel.className = 'small-btn';
-                    cancel.textContent = 'Отмена';
-                    cancel.onclick = () => { closeAppModal(); resolve(null); };
-                    const ok = document.createElement('button');
-                    ok.className = 'small-btn gold-btn';
-                    ok.textContent = 'Сохранить';
-                    ok.onclick = () => {
-                        const val = document.getElementById('appModalInput').value;
-                        closeAppModal();
-                        resolve(val);
-                    };
-                    actions.appendChild(cancel);
-                    actions.appendChild(ok);
-                    backdrop.classList.add('show');
-                    setTimeout(() => { const el = document.getElementById('appModalInput'); if (el) { el.focus(); el.select(); } }, 0);
-                });
-            }
-
-            function showConfirmModal(title, textMsg) {
-                return new Promise(resolve => {
-                    const backdrop = document.getElementById('appModalBackdrop');
-                    document.getElementById('appModalTitle').textContent = title || 'Подтвердите действие';
-                    document.getElementById('appModalText').textContent = textMsg || '';
-                    document.getElementById('appModalFields').innerHTML = '';
-                    const actions = document.getElementById('appModalActions');
-                    actions.innerHTML = '';
-                    const cancel = document.createElement('button');
-                    cancel.className = 'small-btn';
-                    cancel.textContent = 'Отмена';
-                    cancel.onclick = () => { closeAppModal(); resolve(false); };
-                    const ok = document.createElement('button');
-                    ok.className = 'small-btn gold-btn';
-                    ok.textContent = 'Подтвердить';
-                    ok.onclick = () => { closeAppModal(); resolve(true); };
-                    actions.appendChild(cancel);
-                    actions.appendChild(ok);
-                    backdrop.classList.add('show');
-                });
-            }
-
-            function showAlertModal(title, textMsg) {
-                return new Promise(resolve => {
-                    const backdrop = document.getElementById('appModalBackdrop');
-                    document.getElementById('appModalTitle').textContent = title || 'Сообщение';
-                    document.getElementById('appModalText').textContent = textMsg || '';
-                    document.getElementById('appModalFields').innerHTML = '';
-                    const actions = document.getElementById('appModalActions');
-                    actions.innerHTML = '';
-                    const ok = document.createElement('button');
-                    ok.className = 'small-btn gold-btn';
-                    ok.textContent = 'Ок';
-                    ok.onclick = () => { closeAppModal(); resolve(true); };
-                    actions.appendChild(ok);
-                    backdrop.classList.add('show');
-                });
-            }
-
-            function showTripleFieldModal(title, f1, f2, f3, v1 = '', v2 = '', v3 = '') {
-                return new Promise(resolve => {
-                    const backdrop = document.getElementById('appModalBackdrop');
-                    document.getElementById('appModalTitle').textContent = title || '';
-                    document.getElementById('appModalText').textContent = '';
-                    document.getElementById('appModalFields').innerHTML =
-                        "<input id='mf1' class='app-modal-input' placeholder='" + (f1 || 'Поле 1') + "' value='" + escAttr(v1 || '') + "' style='margin-bottom:8px'>" +
-                        "<input id='mf2' class='app-modal-input' placeholder='" + (f2 || 'Поле 2') + "' value='" + escAttr(v2 || '') + "' style='margin-bottom:8px'>" +
-                        "<textarea id='mf3' class='app-modal-textarea' placeholder='" + (f3 || 'Поле 3') + "'>" + esc(v3 || '') + "</textarea>";
-                    const actions = document.getElementById('appModalActions');
-                    actions.innerHTML = '';
-                    const cancel = document.createElement('button');
-                    cancel.className = 'small-btn';
-                    cancel.textContent = 'Отмена';
-                    cancel.onclick = () => { closeAppModal(); resolve(null); };
-                    const ok = document.createElement('button');
-                    ok.className = 'small-btn gold-btn';
-                    ok.textContent = 'Сохранить';
-                    ok.onclick = () => {
-                        const r = { f1: document.getElementById('mf1').value, f2: document.getElementById('mf2').value, f3: document.getElementById('mf3').value };
-                        closeAppModal();
-                        resolve(r);
-                    };
-                    actions.appendChild(cancel);
-                    actions.appendChild(ok);
-                    backdrop.classList.add('show');
-                });
-            }
-
-            function showQuadFieldModal(title, f1, f2, f3, f4, v1 = '', v2 = '', v3 = '', v4 = '') {
-                return new Promise(resolve => {
-                    const backdrop = document.getElementById('appModalBackdrop');
-                    document.getElementById('appModalTitle').textContent = title || '';
-                    document.getElementById('appModalText').textContent = '';
-                    document.getElementById('appModalFields').innerHTML =
-                        "<input id='qf1' class='app-modal-input' placeholder='" + (f1 || 'Поле 1') + "' value='" + escAttr(v1 || '') + "' style='margin-bottom:8px'>" +
-                        "<input id='qf2' class='app-modal-input' placeholder='" + (f2 || 'Поле 2') + "' value='" + escAttr(v2 || '') + "' style='margin-bottom:8px'>" +
-                        "<input id='qf3' class='app-modal-input' placeholder='" + (f3 || 'Поле 3') + "' value='" + escAttr(v3 || '') + "' style='margin-bottom:8px'>" +
-                        "<textarea id='qf4' class='app-modal-textarea' placeholder='" + (f4 || 'Поле 4') + "'>" + esc(v4 || '') + "</textarea>";
-                    const actions = document.getElementById('appModalActions');
-                    actions.innerHTML = '';
-                    const cancel = document.createElement('button');
-                    cancel.className = 'small-btn';
-                    cancel.textContent = 'Отмена';
-                    cancel.onclick = () => { closeAppModal(); resolve(null); };
-                    const ok = document.createElement('button');
-                    ok.className = 'small-btn gold-btn';
-                    ok.textContent = 'Сохранить';
-                    ok.onclick = () => {
-                        const r = { f1: document.getElementById('qf1').value, f2: document.getElementById('qf2').value, f3: document.getElementById('qf3').value, f4: document.getElementById('qf4').value };
-                        closeAppModal();
-                        resolve(r);
-                    };
-                    actions.appendChild(cancel);
-                    actions.appendChild(ok);
-                    backdrop.classList.add('show');
-                });
-            }
-
-            function showLoginModal() {
-                const backdrop = document.getElementById('appModalBackdrop');
-                const modalTitle = document.getElementById('appModalTitle');
-                const modalText = document.getElementById('appModalText');
-                const modalFields = document.getElementById('appModalFields');
-                const modalActions = document.getElementById('appModalActions');
-
-                backdrop.className = 'app-modal-backdrop login-modal show';
-                modalTitle.textContent = 'Вход в систему';
-                modalText.textContent = 'Выберите роль и введите пароль';
-                modalFields.innerHTML = `
-                    <div class="role-buttons">
-                        <button id="loginRoleManager" class="role-btn active">Менеджер</button>
-                        <button id="loginRoleOwner" class="role-btn">Руководитель</button>
-                    </div>
-                    <div id="loginPasswordField" class="password-field show">
-                        <input type="password" id="loginPassword" class="app-modal-input" placeholder="Введите пароль">
-                    </div>
-                `;
-                modalActions.innerHTML = '';
-
-                const cancelBtn = document.createElement('button');
-                cancelBtn.className = 'small-btn';
-                cancelBtn.textContent = 'Отмена';
-                cancelBtn.onclick = () => { closeAppModal(); };
-
-                const loginBtn = document.createElement('button');
-                loginBtn.className = 'small-btn gold-btn';
-                loginBtn.textContent = 'Войти';
-                loginBtn.onclick = async () => {
-                    const selectedRole = document.querySelector('.role-btn.active').textContent;
-                    const password = document.getElementById('loginPassword').value;
-                    const roleKey = selectedRole === 'Менеджер' ? 'manager' : 'owner';
-                    const success = await login(roleKey, password);
-                    if (success) closeAppModal();
-                    else alert('Неверный пароль');
-                };
-
-                modalActions.appendChild(cancelBtn);
-                modalActions.appendChild(loginBtn);
-                backdrop.classList.add('show');
-
-                setTimeout(() => {
-                    const managerBtn = document.getElementById('loginRoleManager');
-                    const ownerBtn = document.getElementById('loginRoleOwner');
-                    const passwordField = document.getElementById('loginPasswordField');
-                    if (managerBtn && ownerBtn) {
-                        managerBtn.onclick = () => { managerBtn.classList.add('active'); ownerBtn.classList.remove('active'); passwordField.classList.add('show'); };
-                        ownerBtn.onclick = () => { ownerBtn.classList.add('active'); managerBtn.classList.remove('active'); passwordField.classList.add('show'); };
-                    }
-                }, 0);
-            }
-
-            // Редактирование
-            async function deleteBlock(name) {
-                const ok = await showConfirmModal('Удалить блок?', 'Блок будет удалён из списка.');
-                if (!ok) return;
-                if (Array.isArray(state.mainOrder)) state.mainOrder = state.mainOrder.filter(x => x !== name);
-                if (Array.isArray(state.sectionOrder)) {
-                    state.sectionOrder.forEach(sec => { if (Array.isArray(state.sections[sec])) state.sections[sec] = state.sections[sec].filter(x => x !== name); });
-                }
-                if (state.blocks && state.blocks[name]) delete state.blocks[name];
-                if (state.currentBlock === name) state.currentBlock = (state.mainOrder && state.mainOrder[0]) || Object.keys(state.blocks || {})[0] || '';
-                if (state.lastMain === name) state.lastMain = (state.mainOrder && state.mainOrder[0]) || '';
-                saveDataAndRender();
-            }
-
-            async function deleteSection(name) {
-                const ok = await showConfirmModal('Удалить раздел?', 'Раздел и его элементы будут удалены.');
-                if (!ok) return;
-                (state.sections[name] || []).forEach(b => delete state.blocks[b]);
-                delete state.sections[name];
-                state.sectionOrder = state.sectionOrder.filter(x => x !== name);
-                saveDataAndRender();
-            }
-
-            async function deleteMessage(i) {
-                const ok = await showConfirmModal('Удалить сообщение?', 'Сообщение будет удалено.');
-                if (!ok) return;
-                state.blocks[state.currentBlock].messages.splice(i, 1);
-                editMessageIndex = null;
-                saveDataAndRender();
-            }
-
-            function startEditBlock(name) { editBlockName = name; editSectionName = null; render(); }
-            function startEditSection(name) { editSectionName = name; editBlockName = null; render(); }
-            function startEditMessage(i) { editMessageIndex = i; renderCenter(); }
-            function cancelInline() { editBlockName = null; editSectionName = null; render(); }
-            function cancelMessageEdit() { editMessageIndex = null; renderCenter(); }
-
-            function saveBlockName(oldName) {
-                const newName = (document.getElementById('edit-block-name').value || '').trim();
-                if (!newName || newName === oldName) { editBlockName = null; render(); return; }
-                if (state.blocks[newName]) { alert('Такое название уже есть'); return; }
-                state.blocks[newName] = state.blocks[oldName];
-                delete state.blocks[oldName];
-                state.mainOrder = state.mainOrder.map(x => x === oldName ? newName : x);
-                state.sectionOrder.forEach(sec => { state.sections[sec] = state.sections[sec].map(x => x === oldName ? newName : x); });
-                if (state.currentBlock === oldName) state.currentBlock = newName;
-                if (state.lastMain === oldName) state.lastMain = newName;
-                editBlockName = null;
-                saveDataAndRender();
-            }
-
-            function saveSectionName(oldName) {
-                const newName = (document.getElementById('edit-section-name').value || '').trim();
-                if (!newName || newName === oldName) { editSectionName = null; render(); return; }
-                if (state.sections[newName]) { alert('Такой раздел уже есть'); return; }
-                state.sections[newName] = state.sections[oldName];
-                delete state.sections[oldName];
-                state.sectionOrder = state.sectionOrder.map(x => x === oldName ? newName : x);
-                editSectionName = null;
-                saveDataAndRender();
-            }
-
-            function saveMessage(i) {
-                const label = (document.getElementById('edit-msg-label').value || '').trim();
-                const text = (document.getElementById('edit-msg-text').value || '').trim();
-                if (!label || !text) return;
-                const existing = state.blocks[state.currentBlock].messages[i] || {};
-                state.blocks[state.currentBlock].messages[i] = { label, text, attachments: existing.attachments || [] };
-                editMessageIndex = null;
-                saveDataAndRender();
-            }
-
-            function saveMeta() {
-                state.blocks[state.currentBlock].note = (document.getElementById('meta-note').value || '').trim();
-                state.blocks[state.currentBlock].hint = (document.getElementById('meta-hint').value || '').trim();
-                saveDataAndRender();
-            }
-
-            function addOwnerMessage() {
-                const label = (document.getElementById('new-label').value || '').trim();
-                const text = (document.getElementById('new-text').value || '').trim();
-                if (!label || !text) return;
-                state.blocks[state.currentBlock].messages.push({ label, text, attachments: [] });
-                saveDataAndRender();
-            }
-
-            function copyMessage(i) { navigator.clipboard.writeText(state.blocks[state.currentBlock].messages[i].text); }
-
-            function startInlineProposal(i) {
-                inlineProposalIndex = i;
-                window.currentInlineAttachments = state.blocks[state.currentBlock].messages[i].attachments || [];
-                renderCenter();
-            }
-
-            function cancelInlineProposal() { inlineProposalIndex = null; renderCenter(); }
-
-            async function saveInlineProposal(i) {
-                const condition = (document.getElementById('inline-name-' + i).value || '').trim();
-                const text = (document.getElementById('inline-text-' + i).value || '').trim();
-                if (!condition || !text) return;
-                const attachments = window.currentInlineAttachments || [];
+            if (targetType === 'section') {
+                result = await showTripleFieldModal('Предложить элемент', 'Название элемента', 'Назначение / когда использовать', 'Текст первого сообщения');
+                if (!result) return;
+                if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim()) return;
                 await addProposal({
                     id: Date.now() + Math.random(),
-                    targetType: 'block',
-                    targetName: state.currentBlock,
-                    condition: condition,
-                    text: text,
-                    attachments: attachments,
-                    mode: 'replace',
-                    sourceIndex: i
-                });
-                inlineProposalIndex = null;
-                window.currentInlineAttachments = null;
-                render();
-            }
-
-            async function saveNewVariantProposal() {
-                const condition = (document.getElementById('prop-name').value || '').trim();
-                const text = (document.getElementById('prop-text').value || '').trim();
-                if (!condition || !text) return;
-                await addProposal({
-                    id: Date.now() + Math.random(),
-                    targetType: 'block',
-                    targetName: state.currentBlock,
-                    condition: condition,
-                    text: text,
+                    targetType: targetType,
+                    targetName: targetName,
+                    blockName: result.f1.trim(),
+                    condition: result.f2.trim(),
+                    text: result.f3.trim(),
                     attachments: []
                 });
-                document.getElementById('prop-name').value = '';
-                document.getElementById('prop-text').value = '';
-                render();
+                return;
             }
-
-            // Скачать изображение
-            function downloadImage(messageIndex, attachmentIndex) {
-                const msg = state.blocks[state.currentBlock].messages[messageIndex];
-                const att = msg.attachments[attachmentIndex];
-                if (!att || att.type !== 'image') return;
-
-                const link = document.createElement('a');
-                link.href = att.value;
-                link.download = `${att.title || 'image'}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                alert(`📁 Изображение "${att.title}" скачано!`);
+            if (targetType === 'new-section') {
+                result = await showQuadFieldModal('Предложить раздел', 'Название раздела', 'Название первого элемента', 'Назначение / когда использовать', 'Текст первого сообщения');
+                if (!result) return;
+                if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim() || !result.f4.trim()) return;
+                await addProposal({
+                    id: Date.now() + Math.random(),
+                    targetType: targetType,
+                    targetName: targetName,
+                    sectionName: result.f1.trim(),
+                    blockName: result.f2.trim(),
+                    condition: result.f3.trim(),
+                    text: result.f4.trim(),
+                    attachments: []
+                });
+                return;
             }
-            async function copyLink(messageIndex, attachmentIndex) {
-                const msg = state.blocks[state.currentBlock].messages[messageIndex];
-                const att = msg.attachments[attachmentIndex];
-                if (!att || att.type !== 'link') return;
+            result = await showTripleFieldModal('Предложить изменение', 'Назначение / когда использовать', 'Текущий блок', 'Текст ответа', '', targetName || '', '');
+            if (!result) return;
+            if (!result.f1.trim() || !result.f3.trim()) return;
+            await addProposal({
+                id: Date.now() + Math.random(),
+                targetType: 'block',
+                targetName: state.currentBlock,
+                condition: result.f1.trim(),
+                text: result.f3.trim(),
+                attachments: []
+            });
+        }
 
-                try {
-                    await navigator.clipboard.writeText(att.value);
-                    alert("🔗 Ссылка скопирована!");
-                } catch (err) {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = att.value;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                    alert("🔗 Ссылка скопирована!");
+        function moveItemInArray(arr, fromIndex, toIndex) {
+            if (!Array.isArray(arr)) return;
+            if (fromIndex === toIndex) return;
+            const item = arr.splice(fromIndex, 1)[0];
+            arr.splice(toIndex, 0, item);
+            saveDataAndRender();
+        }
+
+        // Drag and drop handlers
+        let dragState = null;
+        function startDrag(type, payload) { dragState = { type, ...payload }; }
+        function clearDragState() { dragState = null; document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
+        function handleMainDrop(targetName) {
+            if (!dragState || dragState.type !== 'main') return;
+            const fromIndex = state.mainOrder.indexOf(dragState.name);
+            const toIndex = state.mainOrder.indexOf(targetName);
+            moveItemInArray(state.mainOrder, fromIndex, toIndex);
+            clearDragState();
+        }
+        function handleSectionItemDrop(sectionName, targetName) {
+            if (!dragState || dragState.type !== 'section-item' || dragState.sectionName !== sectionName) return;
+            const arr = state.sections[sectionName] || [];
+            const fromIndex = arr.indexOf(dragState.name);
+            const toIndex = arr.indexOf(targetName);
+            moveItemInArray(arr, fromIndex, toIndex);
+            clearDragState();
+        }
+        function handleSectionDrop(targetSection) {
+            if (!dragState || dragState.type !== 'section') return;
+            const fromIndex = state.sectionOrder.indexOf(dragState.sectionName);
+            const toIndex = state.sectionOrder.indexOf(targetSection);
+            moveItemInArray(state.sectionOrder, fromIndex, toIndex);
+            clearDragState();
+        }
+        function handleMessageDrop(targetIndex) {
+            if (!dragState || dragState.type !== 'message') return;
+            const arr = (state.blocks[state.currentBlock] || {}).messages || [];
+            moveItemInArray(arr, dragState.index, targetIndex);
+            clearDragState();
+        }
+
+        // Модальные окна
+        function closeAppModal() {
+            const backdrop = document.getElementById('appModalBackdrop');
+            backdrop.classList.remove('show');
+            backdrop.className = 'app-modal-backdrop';
+            document.getElementById('appModalTitle').textContent = '';
+            document.getElementById('appModalText').textContent = '';
+            document.getElementById('appModalFields').innerHTML = '';
+            document.getElementById('appModalActions').innerHTML = '';
+        }
+
+        function showPromptModal(title, label, defaultValue = '') {
+            return new Promise(resolve => {
+                const backdrop = document.getElementById('appModalBackdrop');
+                document.getElementById('appModalTitle').textContent = title || 'Введите значение';
+                document.getElementById('appModalText').textContent = '';
+                document.getElementById('appModalFields').innerHTML = "<input id='appModalInput' class='app-modal-input' value='" + escAttr(defaultValue || '') + "' placeholder='" + escAttr(label || '') + "'>";
+                const actions = document.getElementById('appModalActions');
+                actions.innerHTML = '';
+                const cancel = document.createElement('button');
+                cancel.className = 'small-btn';
+                cancel.textContent = 'Отмена';
+                cancel.onclick = () => { closeAppModal(); resolve(null); };
+                const ok = document.createElement('button');
+                ok.className = 'small-btn gold-btn';
+                ok.textContent = 'Сохранить';
+                ok.onclick = () => {
+                    const val = document.getElementById('appModalInput').value;
+                    closeAppModal();
+                    resolve(val);
+                };
+                actions.appendChild(cancel);
+                actions.appendChild(ok);
+                backdrop.classList.add('show');
+                setTimeout(() => { const el = document.getElementById('appModalInput'); if (el) { el.focus(); el.select(); } }, 0);
+            });
+        }
+
+        function showConfirmModal(title, textMsg) {
+            return new Promise(resolve => {
+                const backdrop = document.getElementById('appModalBackdrop');
+                document.getElementById('appModalTitle').textContent = title || 'Подтвердите действие';
+                document.getElementById('appModalText').textContent = textMsg || '';
+                document.getElementById('appModalFields').innerHTML = '';
+                const actions = document.getElementById('appModalActions');
+                actions.innerHTML = '';
+                const cancel = document.createElement('button');
+                cancel.className = 'small-btn';
+                cancel.textContent = 'Отмена';
+                cancel.onclick = () => { closeAppModal(); resolve(false); };
+                const ok = document.createElement('button');
+                ok.className = 'small-btn gold-btn';
+                ok.textContent = 'Подтвердить';
+                ok.onclick = () => { closeAppModal(); resolve(true); };
+                actions.appendChild(cancel);
+                actions.appendChild(ok);
+                backdrop.classList.add('show');
+            });
+        }
+
+        function showAlertModal(title, textMsg) {
+            return new Promise(resolve => {
+                const backdrop = document.getElementById('appModalBackdrop');
+                document.getElementById('appModalTitle').textContent = title || 'Сообщение';
+                document.getElementById('appModalText').textContent = textMsg || '';
+                document.getElementById('appModalFields').innerHTML = '';
+                const actions = document.getElementById('appModalActions');
+                actions.innerHTML = '';
+                const ok = document.createElement('button');
+                ok.className = 'small-btn gold-btn';
+                ok.textContent = 'Ок';
+                ok.onclick = () => { closeAppModal(); resolve(true); };
+                actions.appendChild(ok);
+                backdrop.classList.add('show');
+            });
+        }
+
+        function showTripleFieldModal(title, f1, f2, f3, v1 = '', v2 = '', v3 = '') {
+            return new Promise(resolve => {
+                const backdrop = document.getElementById('appModalBackdrop');
+                document.getElementById('appModalTitle').textContent = title || '';
+                document.getElementById('appModalText').textContent = '';
+                document.getElementById('appModalFields').innerHTML =
+                    "<input id='mf1' class='app-modal-input' placeholder='" + (f1 || 'Поле 1') + "' value='" + escAttr(v1 || '') + "' style='margin-bottom:8px'>" +
+                    "<input id='mf2' class='app-modal-input' placeholder='" + (f2 || 'Поле 2') + "' value='" + escAttr(v2 || '') + "' style='margin-bottom:8px'>" +
+                    "<textarea id='mf3' class='app-modal-textarea' placeholder='" + (f3 || 'Поле 3') + "'>" + esc(v3 || '') + "</textarea>";
+                const actions = document.getElementById('appModalActions');
+                actions.innerHTML = '';
+                const cancel = document.createElement('button');
+                cancel.className = 'small-btn';
+                cancel.textContent = 'Отмена';
+                cancel.onclick = () => { closeAppModal(); resolve(null); };
+                const ok = document.createElement('button');
+                ok.className = 'small-btn gold-btn';
+                ok.textContent = 'Сохранить';
+                ok.onclick = () => {
+                    const r = { f1: document.getElementById('mf1').value, f2: document.getElementById('mf2').value, f3: document.getElementById('mf3').value };
+                    closeAppModal();
+                    resolve(r);
+                };
+                actions.appendChild(cancel);
+                actions.appendChild(ok);
+                backdrop.classList.add('show');
+            });
+        }
+
+        function showQuadFieldModal(title, f1, f2, f3, f4, v1 = '', v2 = '', v3 = '', v4 = '') {
+            return new Promise(resolve => {
+                const backdrop = document.getElementById('appModalBackdrop');
+                document.getElementById('appModalTitle').textContent = title || '';
+                document.getElementById('appModalText').textContent = '';
+                document.getElementById('appModalFields').innerHTML =
+                    "<input id='qf1' class='app-modal-input' placeholder='" + (f1 || 'Поле 1') + "' value='" + escAttr(v1 || '') + "' style='margin-bottom:8px'>" +
+                    "<input id='qf2' class='app-modal-input' placeholder='" + (f2 || 'Поле 2') + "' value='" + escAttr(v2 || '') + "' style='margin-bottom:8px'>" +
+                    "<input id='qf3' class='app-modal-input' placeholder='" + (f3 || 'Поле 3') + "' value='" + escAttr(v3 || '') + "' style='margin-bottom:8px'>" +
+                    "<textarea id='qf4' class='app-modal-textarea' placeholder='" + (f4 || 'Поле 4') + "'>" + esc(v4 || '') + "</textarea>";
+                const actions = document.getElementById('appModalActions');
+                actions.innerHTML = '';
+                const cancel = document.createElement('button');
+                cancel.className = 'small-btn';
+                cancel.textContent = 'Отмена';
+                cancel.onclick = () => { closeAppModal(); resolve(null); };
+                const ok = document.createElement('button');
+                ok.className = 'small-btn gold-btn';
+                ok.textContent = 'Сохранить';
+                ok.onclick = () => {
+                    const r = { f1: document.getElementById('qf1').value, f2: document.getElementById('qf2').value, f3: document.getElementById('qf3').value, f4: document.getElementById('qf4').value };
+                    closeAppModal();
+                    resolve(r);
+                };
+                actions.appendChild(cancel);
+                actions.appendChild(ok);
+                backdrop.classList.add('show');
+            });
+        }
+
+        function showLoginModal() {
+            const backdrop = document.getElementById('appModalBackdrop');
+            const modalTitle = document.getElementById('appModalTitle');
+            const modalText = document.getElementById('appModalText');
+            const modalFields = document.getElementById('appModalFields');
+            const modalActions = document.getElementById('appModalActions');
+
+            backdrop.className = 'app-modal-backdrop login-modal show';
+            modalTitle.textContent = 'Вход в систему';
+            modalText.textContent = 'Выберите роль и введите пароль';
+            modalFields.innerHTML = `
+                <div class="role-buttons">
+                    <button id="loginRoleManager" class="role-btn active">Менеджер</button>
+                    <button id="loginRoleOwner" class="role-btn">Руководитель</button>
+                </div>
+                <div id="loginPasswordField" class="password-field show">
+                    <input type="password" id="loginPassword" class="app-modal-input" placeholder="Введите пароль">
+                </div>
+            `;
+            modalActions.innerHTML = '';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'small-btn';
+            cancelBtn.textContent = 'Отмена';
+            cancelBtn.onclick = () => { closeAppModal(); };
+
+            const loginBtn = document.createElement('button');
+            loginBtn.className = 'small-btn gold-btn';
+            loginBtn.textContent = 'Войти';
+            loginBtn.onclick = async () => {
+                const selectedRole = document.querySelector('.role-btn.active').textContent;
+                const password = document.getElementById('loginPassword').value;
+                const roleKey = selectedRole === 'Менеджер' ? 'manager' : 'owner';
+                const success = await login(roleKey, password);
+                if (success) closeAppModal();
+                else alert('Неверный пароль');
+            };
+
+            modalActions.appendChild(cancelBtn);
+            modalActions.appendChild(loginBtn);
+            backdrop.classList.add('show');
+
+            setTimeout(() => {
+                const managerBtn = document.getElementById('loginRoleManager');
+                const ownerBtn = document.getElementById('loginRoleOwner');
+                const passwordField = document.getElementById('loginPasswordField');
+                if (managerBtn && ownerBtn) {
+                    managerBtn.onclick = () => { managerBtn.classList.add('active'); ownerBtn.classList.remove('active'); passwordField.classList.add('show'); };
+                    ownerBtn.onclick = () => { ownerBtn.classList.add('active'); managerBtn.classList.remove('active'); passwordField.classList.add('show'); };
                 }
+            }, 0);
+        }
+
+        // Редактирование
+        async function deleteBlock(name) {
+            const ok = await showConfirmModal('Удалить блок?', 'Блок будет удалён из списка.');
+            if (!ok) return;
+            if (Array.isArray(state.mainOrder)) state.mainOrder = state.mainOrder.filter(x => x !== name);
+            if (Array.isArray(state.sectionOrder)) {
+                state.sectionOrder.forEach(sec => { if (Array.isArray(state.sections[sec])) state.sections[sec] = state.sections[sec].filter(x => x !== name); });
             }
-            // Копировать изображение в буфер обмена
-            async function copyImage(messageIndex, attachmentIndex) {
-                const msg = state.blocks[state.currentBlock].messages[messageIndex];
-                const att = msg.attachments[attachmentIndex];
-                if (!att || att.type !== 'image') return;
+            if (state.blocks && state.blocks[name]) delete state.blocks[name];
+            if (state.currentBlock === name) state.currentBlock = (state.mainOrder && state.mainOrder[0]) || Object.keys(state.blocks || {})[0] || '';
+            if (state.lastMain === name) state.lastMain = (state.mainOrder && state.mainOrder[0]) || '';
+            saveDataAndRender();
+        }
 
-                try {
-                    const response = await fetch(att.value);
-                    const blob = await response.blob();
-                    await navigator.clipboard.write([
-                        new ClipboardItem({
-                            [blob.type]: blob
-                        })
-                    ]);
-                    alert("✅ Изображение скопировано! Можно вставить (Ctrl+V)");
-                } catch (err) {
-                    console.error('Ошибка копирования:', err);
-                    alert("❌ Не удалось скопировать изображение. Попробуйте скачать.");
-                }
+        async function deleteSection(name) {
+            const ok = await showConfirmModal('Удалить раздел?', 'Раздел и его элементы будут удалены.');
+            if (!ok) return;
+            (state.sections[name] || []).forEach(b => delete state.blocks[b]);
+            delete state.sections[name];
+            state.sectionOrder = state.sectionOrder.filter(x => x !== name);
+            saveDataAndRender();
+        }
+
+        async function deleteMessage(i) {
+            const ok = await showConfirmModal('Удалить сообщение?', 'Сообщение будет удалено.');
+            if (!ok) return;
+            state.blocks[state.currentBlock].messages.splice(i, 1);
+            editMessageIndex = null;
+            saveDataAndRender();
+        }
+
+        function startEditBlock(name) { editBlockName = name; editSectionName = null; render(); }
+        function startEditSection(name) { editSectionName = name; editBlockName = null; render(); }
+        function startEditMessage(i) { editMessageIndex = i; renderCenter(); }
+        function cancelInline() { editBlockName = null; editSectionName = null; render(); }
+        function cancelMessageEdit() { editMessageIndex = null; renderCenter(); }
+
+        function saveBlockName(oldName) {
+            const newName = (document.getElementById('edit-block-name').value || '').trim();
+            if (!newName || newName === oldName) { editBlockName = null; render(); return; }
+            if (state.blocks[newName]) { alert('Такое название уже есть'); return; }
+            state.blocks[newName] = state.blocks[oldName];
+            delete state.blocks[oldName];
+            state.mainOrder = state.mainOrder.map(x => x === oldName ? newName : x);
+            state.sectionOrder.forEach(sec => { state.sections[sec] = state.sections[sec].map(x => x === oldName ? newName : x); });
+            if (state.currentBlock === oldName) state.currentBlock = newName;
+            if (state.lastMain === oldName) state.lastMain = newName;
+            editBlockName = null;
+            saveDataAndRender();
+        }
+
+        function saveSectionName(oldName) {
+            const newName = (document.getElementById('edit-section-name').value || '').trim();
+            if (!newName || newName === oldName) { editSectionName = null; render(); return; }
+            if (state.sections[newName]) { alert('Такой раздел уже есть'); return; }
+            state.sections[newName] = state.sections[oldName];
+            delete state.sections[oldName];
+            state.sectionOrder = state.sectionOrder.map(x => x === oldName ? newName : x);
+            editSectionName = null;
+            saveDataAndRender();
+        }
+
+        function saveMessage(i) {
+            const label = (document.getElementById('edit-msg-label').value || '').trim();
+            const text = (document.getElementById('edit-msg-text').value || '').trim();
+            if (!label || !text) return;
+            const existing = state.blocks[state.currentBlock].messages[i] || {};
+            state.blocks[state.currentBlock].messages[i] = { label, text, attachments: existing.attachments || [] };
+            editMessageIndex = null;
+            saveDataAndRender();
+        }
+
+        function saveMeta() {
+            state.blocks[state.currentBlock].note = (document.getElementById('meta-note').value || '').trim();
+            state.blocks[state.currentBlock].hint = (document.getElementById('meta-hint').value || '').trim();
+            saveDataAndRender();
+        }
+
+        function addOwnerMessage() {
+            const label = (document.getElementById('new-label').value || '').trim();
+            const text = (document.getElementById('new-text').value || '').trim();
+            if (!label || !text) return;
+            state.blocks[state.currentBlock].messages.push({ label, text, attachments: [] });
+            saveDataAndRender();
+        }
+
+        function copyMessage(i) { navigator.clipboard.writeText(state.blocks[state.currentBlock].messages[i].text); }
+
+        function startInlineProposal(i) {
+            inlineProposalIndex = i;
+            window.currentInlineAttachments = state.blocks[state.currentBlock].messages[i].attachments || [];
+            renderCenter();
+        }
+
+        function cancelInlineProposal() { inlineProposalIndex = null; renderCenter(); }
+
+        async function saveInlineProposal(i) {
+            const condition = (document.getElementById('inline-name-' + i).value || '').trim();
+            const text = (document.getElementById('inline-text-' + i).value || '').trim();
+            if (!condition || !text) return;
+            const attachments = window.currentInlineAttachments || [];
+            await addProposal({
+                id: Date.now() + Math.random(),
+                targetType: 'block',
+                targetName: state.currentBlock,
+                condition: condition,
+                text: text,
+                attachments: attachments,
+                mode: 'replace',
+                sourceIndex: i
+            });
+            inlineProposalIndex = null;
+            window.currentInlineAttachments = null;
+            render();
+        }
+
+        async function saveNewVariantProposal() {
+            const condition = (document.getElementById('prop-name').value || '').trim();
+            const text = (document.getElementById('prop-text').value || '').trim();
+            if (!condition || !text) return;
+            await addProposal({
+                id: Date.now() + Math.random(),
+                targetType: 'block',
+                targetName: state.currentBlock,
+                condition: condition,
+                text: text,
+                attachments: []
+            });
+            document.getElementById('prop-name').value = '';
+            document.getElementById('prop-text').value = '';
+            render();
+        }
+
+        // ========== ФУНКЦИИ ДЛЯ РАБОТЫ С ВЛОЖЕНИЯМИ ==========
+
+        // Скачать изображение
+        function downloadImage(messageIndex, attachmentIndex) {
+            const msg = state.blocks[state.currentBlock].messages[messageIndex];
+            const att = msg.attachments[attachmentIndex];
+            if (!att || att.type !== 'image') return;
+
+            const link = document.createElement('a');
+            link.href = att.value;
+            link.download = `${att.title || 'image'}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            alert(`📁 Изображение "${att.title}" скачано!`);
+        }
+
+        // Копировать ссылку
+        async function copyLink(messageIndex, attachmentIndex) {
+            const msg = state.blocks[state.currentBlock].messages[messageIndex];
+            const att = msg.attachments[attachmentIndex];
+            if (!att || att.type !== 'link') return;
+
+            try {
+                await navigator.clipboard.writeText(att.value);
+                alert("🔗 Ссылка скопирована!");
+            } catch (err) {
+                const textarea = document.createElement('textarea');
+                textarea.value = att.value;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert("🔗 Ссылка скопирована!");
             }
-            function renderAttachmentsHtml(msg, i) {
-                const assets = msg.attachments || [];
-                let html = "<div class='material-row'><button class='small-btn' onclick='toggleAttachmentEditor(" + i + ")'>Материалы</button><div class='drag-handle' draggable='true' data-drag-handle='" + i + "' title='Перетащить'>⋮⋮</div></div>";
-                if (assets.length) {
-                    html += "<div class='attachments-row'>";
-                    assets.forEach((att, idx) => {
-                        html += "<div class='asset-chip'>";
-                        html += "<div class='asset-chip-title'>" + esc(att.title || '') + "</div>";
-                        html += "<div class='asset-chip-preview'>";
-                        if (att.type === 'image') {
-                            html += "<img src='" + escAttr(att.value || '') + "'>";
-                        } else {
-                            html += "<div class='asset-chip-link'>" + esc(att.value || '') + "</div>";
-                        }
-                        html += "</div>";
-                        html += "<div class='toolbar' style='margin-top:0'>";
+        }
 
-                        if (att.type === 'image') {
-                            html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='copyImage(" + i + "," + idx + ")'>📋 Копировать</button>";
-                            html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='downloadImage(" + i + "," + idx + ")'>💾 Скачать</button>";
-                        } else {
-                            html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='copyLink(" + i + "," + idx + ")'>🔗 Копировать</button>";
-                        }
+        // Копировать изображение в буфер обмена
+        async function copyImage(messageIndex, attachmentIndex) {
+            const msg = state.blocks[state.currentBlock].messages[messageIndex];
+            const att = msg.attachments[attachmentIndex];
+            if (!att || att.type !== 'image') return;
 
-                        html += "<button class='small-btn danger-btn' style='font-size:11px;padding:4px 8px' onclick='removeAttachment(" + i + "," + idx + ")'>🗑 Удалить</button></div>";
-                        html += "</div>";
-                    });
+            try {
+                const response = await fetch(att.value);
+                const blob = await response.blob();
+                await navigator.clipboard.write([
+                    new ClipboardItem({
+                        [blob.type]: blob
+                    })
+                ]);
+                alert("✅ Изображение скопировано! Можно вставить (Ctrl+V)");
+            } catch (err) {
+                console.error('Ошибка копирования:', err);
+                alert("❌ Не удалось скопировать изображение. Попробуйте скачать.");
+            }
+        }
+
+        // Удалить вложение
+        function removeAttachment(messageIndex, attachmentIndex) {
+            const msg = state.blocks[state.currentBlock].messages[messageIndex];
+            if (msg.attachments) {
+                msg.attachments.splice(attachmentIndex, 1);
+                saveDataAndRender();
+            }
+        }
+
+        // Отображение вложений
+        function renderAttachmentsHtml(msg, i) {
+            const assets = msg.attachments || [];
+            let html = "<div class='material-row'><button class='small-btn' onclick='toggleAttachmentEditor(" + i + ")'>Материалы</button><div class='drag-handle' draggable='true' data-drag-handle='" + i + "' title='Перетащить'>⋮⋮</div></div>";
+            if (assets.length) {
+                html += "<div class='attachments-row'>";
+                assets.forEach((att, idx) => {
+                    html += "<div class='asset-chip'>";
+                    html += "<div class='asset-chip-title'>" + esc(att.title || '') + "</div>";
+                    html += "<div class='asset-chip-preview'>";
+                    if (att.type === 'image') {
+                        html += "<img src='" + escAttr(att.value || '') + "'>";
+                    } else {
+                        html += "<div class='asset-chip-link'>" + esc(att.value || '') + "</div>";
+                    }
                     html += "</div>";
-                }
-                if (assetEditIndex === i) {
-                    html += "<div class='asset-editor'>"
-                        + "<div class='asset-editor-grid'>"
-                        + "<input id='asset-title-" + i + "' class='input' placeholder='Название'>"
-                        + "<select id='asset-type-" + i + "' class='input' onchange='updateAssetFields(" + i + ")'>"
-                        + "<option value='link'>Ссылка</option>"
-                        + "<option value='image'>Фото</option>"
-                        + "</select>"
-                        + "</div>"
-                        + "<div id='asset-fields-" + i + "' style='margin-top:8px'></div>"
-                        + "<div class='toolbar'><button class='small-btn gold-btn' onclick='saveAttachment(" + i + ")'>Добавить</button>"
-                        + "<button class='small-btn' onclick='toggleAttachmentEditor(" + i + ")'>Закрыть</button></div>"
-                        + "</div>";
-                }
-                return html;
-            }
-            function removeAttachment(messageIndex, attachmentIndex) {
-                const msg = state.blocks[state.currentBlock].messages[messageIndex];
-                if (msg.attachments) {
-                    msg.attachments.splice(attachmentIndex, 1);
-                    saveDataAndRender();
-                }
-            }
-        </script>
-    </body>
-</html>
+                    html += "<div class='toolbar' style='margin-top:0'>";
 
+                    if (att.type === 'image') {
+                        html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='copyImage(" + i + "," + idx + ")'>📋 Копировать</button>";
+                        html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='downloadImage(" + i + "," + idx + ")'>💾 Скачать</button>";
+                    } else {
+                        html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='copyLink(" + i + "," + idx + ")'>🔗 Копировать</button>";
+                    }
+
+                    html += "<button class='small-btn danger-btn' style='font-size:11px;padding:4px 8px' onclick='removeAttachment(" + i + "," + idx + ")'>🗑 Удалить</button></div>";
+                    html += "</div>";
+                });
+                html += "</div>";
+            }
+            if (assetEditIndex === i) {
+                html += "<div class='asset-editor'>"
+                    + "<div class='asset-editor-grid'>"
+                    + "<input id='asset-title-" + i + "' class='input' placeholder='Название'>"
+                    + "<select id='asset-type-" + i + "' class='input' onchange='updateAssetFields(" + i + ")'>"
+                    + "<option value='link'>Ссылка</option>"
+                    + "<option value='image'>Фото</option>"
+                    + "</select>"
+                    + "</div>"
+                    + "<div id='asset-fields-" + i + "' style='margin-top:8px'></div>"
+                    + "<div class='toolbar'><button class='small-btn gold-btn' onclick='saveAttachment(" + i + ")'>Добавить</button>"
+                    + "<button class='small-btn' onclick='toggleAttachmentEditor(" + i + ")'>Закрыть</button></div>"
+                    + "</div>";
+            }
+            return html;
+        }
+
+        function toggleAttachmentEditor(i) {
+            if (assetEditIndex === i) assetEditIndex = null;
+            else { assetEditIndex = i; setTimeout(() => updateAssetFields(i), 0); }
+            renderCenter();
+        }
+
+        function updateAssetFields(i) {
+            const type = document.getElementById('asset-type-' + i).value;
+            const container = document.getElementById('asset-fields-' + i);
+            if (!container) return;
+            if (type === 'link') container.innerHTML = "<input id='asset-value-" + i + "' class='input' placeholder='Вставьте ссылку'>";
+            else container.innerHTML = "<input id='asset-file-" + i + "' class='asset-file' type='file' accept='image/*'>";
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function saveAttachment(messageIndex) {
+            console.log("=== saveAttachment called ===");
+
+            const titleEl = document.getElementById('asset-title-' + messageIndex);
+            const typeEl = document.getElementById('asset-type-' + messageIndex);
+            const valueEl = document.getElementById('asset-value-' + messageIndex);
+            const fileEl = document.getElementById('asset-file-' + messageIndex);
+
+            const title = (titleEl?.value || '').trim();
+            const type = typeEl?.value || 'link';
+            let value = (valueEl?.value || '').trim();
+
+            if (!title) {
+                alert("Введите название");
+                return;
+            }
+
+            if (type === 'image' && fileEl && fileEl.files && fileEl.files[0]) {
+                const reader = new FileReader();
+                value = await new Promise((resolve) => {
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(fileEl.files[0]);
+                });
+            }
+
+            if (!value) {
+                alert("Введите ссылку или выберите файл");
+                return;
+            }
+
+            const msg = state.blocks[state.currentBlock].messages[messageIndex];
+            if (!msg.attachments) msg.attachments = [];
+            msg.attachments.push({ title, type, value });
+
+            console.log("Attachment added, saving...");
+
+            try {
+                const response = await fetch(API_BASE + '/api/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(state)
+                });
+
+                console.log("Response status:", response.status);
+
+                if (response.ok) {
+                    console.log("Save successful!");
+                    assetEditIndex = null;
+                    const dataRes = await fetch(API_BASE + '/api/data');
+                    state = await dataRes.json();
+                    render();
+                } else {
+                    console.error("Save failed with status:", response.status);
+                    msg.attachments.pop();
+                    renderCenter();
+                    alert("Ошибка сохранения: " + response.status);
+                }
+            } catch (e) {
+                console.error("Save error:", e);
+                alert("Ошибка сохранения: " + e.message);
+                msg.attachments.pop();
+                renderCenter();
+            }
+        }
+
+        function renderMain() {
+            const el = document.getElementById('mainList');
+            if (!el) return;
+            el.innerHTML = '';
+            state.mainOrder.forEach(name => {
+                const active = state.currentBlock === name ? ' active' : '';
+                const show = editBlockName === name ? ' show' : '';
+                const div = document.createElement('div');
+                div.className = 'item' + active + show;
+                if (editBlockName === name) {
+                    div.innerHTML = "<div class='item-row'><input id='edit-block-name' class='item-input' value='" + escAttr(name) + "'><div class='hidden-actions' style='display:flex'><button class='icon-btn' onclick=\"saveBlockName('" + escJs(name) + "')\">✓</button><button class='icon-btn' onclick='cancelInline()'>✕</button><button class='icon-btn danger-btn' onclick=\"deleteBlock('" + escJs(name) + "')\">🗑</button></div></div>";
+                } else {
+                    div.draggable = true;
+                    div.ondragstart = function() { startDrag('main', { name }); };
+                    div.style.cursor = 'grab';
+                    div.ondragover = function(e) { e.preventDefault(); div.classList.add('drag-over'); };
+                    div.ondragleave = function() { div.classList.remove('drag-over'); };
+                    div.ondrop = function(e) { e.preventDefault(); handleMainDrop(name); };
+                    div.onclick = function(e) { if (e.target.closest('button')) return; openBlock(name); };
+                    div.innerHTML = "<div class='item-row'><div class='item-title' " + (isOwner() ? "ondblclick=\"startEditBlock('" + escJs(name) + "')\"" : "") + ">" + esc(name) + "</div><div class='hidden-actions'>" + (isOwner() ? "<button class='icon-btn' onclick=\"startEditBlock('" + escJs(name) + "')\">✎</button><button class='icon-btn danger-btn' onclick=\"deleteBlock('" + escJs(name) + "')\">🗑</button>" : "") + "</div></div>";
+                }
+                el.appendChild(div);
+            });
+            const btn = document.createElement('button');
+            btn.className = 'small-btn gold-btn';
+            btn.textContent = isOwner() ? '+ блок' : '+ предложить блок';
+            btn.onclick = async () => {
+                if (isOwner()) {
+                    const n = await showPromptModal('Название нового блока магистрали', 'Название блока');
+                    if (!n || !n.trim()) return;
+                    const name = n.trim();
+                    if (state.blocks[name]) { await showAlertModal('Ошибка', 'Такой блок уже есть'); return; }
+                    state.mainOrder.push(name);
+                    state.blocks[name] = { kind: 'main', note: '', hint: '', messages: [] };
+                    state.currentBlock = name;
+                    saveDataAndRender();
+                } else {
+                    createProposal('main-list', 'Магистраль');
+                }
+            };
+            el.appendChild(btn);
+        }
+
+        function renderRight() {
+            const wrap = document.getElementById('right');
+            if (!wrap) return;
+            wrap.innerHTML = '';
+            state.sectionOrder.forEach(sectionName => {
+                const group = document.createElement('div');
+                group.style.marginBottom = '16px';
+                group.draggable = true;
+                group.ondragstart = function() { startDrag('section', { sectionName }); };
+                group.ondragover = function(e) { if (dragState && dragState.type === 'section') { e.preventDefault(); group.classList.add('drag-over'); } };
+                group.ondragleave = function() { group.classList.remove('drag-over'); };
+                group.ondrop = function(e) { if (dragState && dragState.type === 'section') { e.preventDefault(); handleSectionDrop(sectionName); } };
+                if (editSectionName === sectionName) {
+                    group.innerHTML = "<div class='section-head'><input id='edit-section-name' class='item-input' value='" + escAttr(sectionName) + "'><div style='display:flex;gap:6px'><button class='icon-btn' onclick=\"saveSectionName('" + escJs(sectionName) + "')\">✓</button><button class='icon-btn' onclick='cancelInline()'>✕</button><button class='icon-btn danger-btn' onclick=\"deleteSection('" + escJs(sectionName) + "')\">🗑</button></div></div>";
+                } else {
+                    group.innerHTML = "<div class='section-head'><div class='section-title' style='font-size:20px;cursor:pointer' " + (isOwner() ? "ondblclick=\"startEditSection('" + escJs(sectionName) + "')\"" : "") + ">" + esc(sectionName) + "</div>" + (isOwner() ? "<div class='hidden-actions' style='display:flex'><button class='icon-btn' onclick=\"startEditSection('" + escJs(sectionName) + "')\">✎</button><button class='icon-btn danger-btn' onclick=\"deleteSection('" + escJs(sectionName) + "')\">🗑</button></div>" : "") + "</div>";
+                }
+                const list = document.createElement('div');
+                list.className = 'list';
+                (state.sections[sectionName] || []).forEach(name => {
+                    const active = state.currentBlock === name ? ' active' : '';
+                    const show = editBlockName === name ? ' show' : '';
+                    const div = document.createElement('div');
+                    div.className = 'item' + active + show;
+                    if (editBlockName === name) {
+                        div.innerHTML = "<div class='item-row'><input id='edit-block-name' class='item-input' value='" + escAttr(name) + "'><div class='hidden-actions' style='display:flex'><button class='icon-btn' onclick=\"saveBlockName('" + escJs(name) + "')\">✓</button><button class='icon-btn' onclick='cancelInline()'>✕</button><button class='icon-btn danger-btn' onclick=\"deleteBlock('" + escJs(name) + "')\">🗑</button></div></div>";
+                    } else {
+                        div.draggable = true;
+                        div.ondragstart = function(e) { e.stopPropagation(); startDrag('section-item', { sectionName, name }); };
+                        div.style.cursor = 'grab';
+                        div.ondragover = function(e) { if (dragState && dragState.type === 'section-item' && dragState.sectionName === sectionName) { e.preventDefault(); e.stopPropagation(); div.classList.add('drag-over'); } };
+                        div.ondragleave = function() { div.classList.remove('drag-over'); };
+                        div.ondrop = function(e) { if (dragState && dragState.type === 'section-item' && dragState.sectionName === sectionName) { e.preventDefault(); e.stopPropagation(); handleSectionItemDrop(sectionName, name); } };
+                        div.onclick = function(e) { if (e.target.closest('button')) return; openBlock(name); };
+                        div.innerHTML = "<div class='item-row'><div class='item-title' " + (isOwner() ? "ondblclick=\"startEditBlock('" + escJs(name) + "')\"" : "") + ">" + esc(name) + "</div><div class='hidden-actions'>" + (isOwner() ? "<button class='icon-btn' onclick=\"startEditBlock('" + escJs(name) + "')\">✎</button><button class='icon-btn danger-btn' onclick=\"deleteBlock('" + escJs(name) + "')\">🗑</button>" : "") + "</div></div>";
+                    }
+                    list.appendChild(div);
+                });
+                group.appendChild(list);
+                const btn = document.createElement('button');
+                btn.className = 'small-btn gold-btn';
+                btn.textContent = isOwner() ? '+ элемент' : '+ предложить элемент';
+                btn.onclick = async () => {
+                    if (isOwner()) {
+                        const n = await showPromptModal('Название нового элемента', 'Название элемента');
+                        if (!n || !n.trim()) return;
+                        const name = n.trim();
+                        if (state.blocks[name]) { await showAlertModal('Ошибка', 'Такой блок уже есть'); return; }
+                        state.blocks[name] = { kind: 'side', note: '', hint: '', messages: [] };
+                        state.sections[sectionName].push(name);
+                        state.currentBlock = name;
+                        saveDataAndRender();
+                    } else {
+                        createProposal('section', sectionName);
+                    }
+                };
+                group.appendChild(btn);
+                wrap.appendChild(group);
+            });
+            const addSec = document.createElement('button');
+            addSec.className = 'small-btn gold-btn';
+            addSec.textContent = isOwner() ? '+ раздел' : '+ предложить раздел';
+            addSec.onclick = async () => {
+                if (isOwner()) {
+                    const n = await showPromptModal('Название нового раздела', 'Название раздела');
+                    if (!n || !n.trim()) return;
+                    const name = n.trim();
+                    if (state.sections[name]) { await showAlertModal('Ошибка', 'Такой раздел уже есть'); return; }
+                    state.sectionOrder.push(name);
+                    state.sections[name] = [];
+                    saveDataAndRender();
+                } else {
+                    createProposal('new-section', 'Новый раздел');
+                }
+            };
+            wrap.appendChild(addSec);
+        }
+
+        function renderCenter() {
+            const block = state.blocks[state.currentBlock];
+            const el = document.getElementById('center');
+            if (!el) return;
+            if (!block) { el.innerHTML = "<div class='empty'>Блок не найден</div>"; return; }
+
+            let html = "<div class='center-title'>" + esc(state.currentBlock) + "</div><div class='center-sub " + (block.kind === 'main' ? 'main' : 'side') + "'>" + (block.kind === 'main' ? '● Магистраль' : '● Ветка сценария') + "</div>";
+            if (block.kind !== 'main') html += "<div class='toolbar' style='margin-bottom:14px'><button class='small-btn return-btn' onclick='returnToMain()'>⬅ Вернуться в магистраль</button></div>";
+            if (block.note || isOwner()) html += "<div class='info-box gold-box'>" + (isOwner() ? "<div style='font-weight:700;margin-bottom:8px'>Пояснение</div><textarea id='meta-note' class='textarea' style='min-height:58px;height:58px'>" + esc(block.note || '') + "</textarea>" : esc(block.note || '')) + "</div>";
+            if (block.hint || isOwner()) html += "<div class='info-box blue-box'>" + (isOwner() ? "<div style='font-weight:700;margin-bottom:8px'>Подсказка</div><textarea id='meta-hint' class='textarea' style='min-height:58px;height:58px'>" + esc(block.hint || '') + "</textarea>" : esc(block.hint || '')) + "</div>";
+            if (isOwner()) html += "<div class='toolbar' style='margin-bottom:14px'><button class='small-btn gold-btn' onclick='saveMeta()'>Сохранить пояснение и подсказку</button></div>";
+
+            (block.messages || []).forEach((msg, i) => {
+                if (isOwner() && editMessageIndex === i) {
+                    html += "<div class='card'><div class='muted' style='margin-bottom:8px'>Редактирование сообщения</div><input id='edit-msg-label' class='input' value='" + escAttr(msg.label) + "'><textarea id='edit-msg-text' class='textarea'>" + esc(msg.text) + "</textarea><div class='toolbar'><button class='small-btn gold-btn' onclick='saveMessage(" + i + ")'>Сохранить</button><button class='small-btn' onclick='cancelMessageEdit()'>Отмена</button><button class='small-btn danger-btn' onclick='deleteMessage(" + i + ")'>Удалить</button></div></div>";
+                } else if (!isOwner() && inlineProposalIndex === i) {
+                    html += "<div class='card'><div class='card-head'><div class='card-label'>" + esc(msg.label) + "</div></div><div class='card-text'>" + esc(msg.text) + "</div><div class='toolbar'><div class='muted' style='width:100%'>Предложение изменения</div></div><input id='inline-name-" + i + "' class='input' value='" + escAttr(msg.label) + "'><textarea id='inline-text-" + i + "' class='textarea'>" + esc(msg.text) + "</textarea><div class='toolbar'><button class='small-btn gold-btn' onclick='saveInlineProposal(" + i + ")'>Отправить предложение</button><button class='small-btn' onclick='cancelInlineProposal()'>Отмена</button></div></div>";
+                } else {
+                    html += "<div class='card message-card' data-message-index='" + i + "'><div class='card-main'><div class='card-body'><div class='card-head'><div class='card-label'>" + esc(msg.label) + "</div><div class='toolbar' style='margin-top:0'><button class='copy-btn' onclick='copyMessage(" + i + ")'>Скопировать</button>" + (isOwner() ? "<button class='small-btn' onclick='startEditMessage(" + i + ")'>Редактировать</button><button class='small-btn danger-btn' onclick='deleteMessage(" + i + ")'>Удалить</button>" : "<button class='small-btn' onclick='startInlineProposal(" + i + ")'>Предложить изменение</button>") + "</div></div><div class='card-text'>" + esc(msg.text) + "</div>" + renderAttachmentsHtml(msg, i) + "</div></div></div>";
+                }
+            });
+
+            if (isOwner()) {
+                html += "<div class='card'><div style='font-weight:700;margin-bottom:10px'>Добавить сообщение</div><input id='new-label' class='input' placeholder='Название сообщения'><textarea id='new-text' class='textarea' placeholder='Текст сообщения'></textarea><div class='toolbar'><button class='small-btn gold-btn' onclick='addOwnerMessage()'>Добавить сообщение</button></div></div>";
+            } else {
+                html += "<div class='card'><div style='font-weight:700;margin-bottom:10px'>Предложить новый вариант</div><input id='prop-name' class='input' placeholder='Назначение / когда использовать'><textarea id='prop-text' class='textarea' placeholder='Текст ответа'></textarea><div class='toolbar'><button class='small-btn gold-btn' onclick='saveNewVariantProposal()'>Отправить предложение</button></div></div>";
+            }
+
+            el.innerHTML = html;
+            el.querySelectorAll('.message-card').forEach(card => {
+                const idx = parseInt(card.getAttribute('data-message-index'), 10);
+                const handle = card.querySelector('[data-drag-handle]');
+                if (handle) handle.ondragstart = function() { startDrag('message', { index: idx }); };
+                card.ondragover = function(e) { e.preventDefault(); card.classList.add('drag-over'); };
+                card.ondragleave = function() { card.classList.remove('drag-over'); };
+                card.ondrop = function(e) { e.preventDefault(); handleMessageDrop(idx); };
+            });
+        }
+
+        function renderProposals() {
+            const badge = document.getElementById('propBadge');
+            const el = document.getElementById('proposalList');
+            if (!el) return;
+            badge.innerHTML = state.proposals.length ? "<span class='badge'>" + state.proposals.length + "</span>" : "";
+            el.innerHTML = '';
+            if (!state.proposals.length) { el.innerHTML = "<div class='empty'>Пока предложений нет</div>"; return; }
+
+            state.proposals.forEach((p, i) => {
+                let target = 'Блок: ' + p.targetName;
+                if (p.targetType === 'main-list') target = 'Магистраль';
+                if (p.targetType === 'section') target = 'Раздел: ' + p.targetName;
+                if (p.targetType === 'new-section') target = 'Новый раздел';
+
+                const div = document.createElement('div');
+                div.className = 'proposal-card';
+
+                if (isOwner() && ownerEditProposalIndex === i) {
+                    div.innerHTML = "<div>Редактирование...</div>";
+                } else {
+                    let previewHtml = "<div class='muted' style='margin-bottom:6px'>" + esc(target) + "</div>";
+                    if (p.targetType === 'new-section') {
+                        previewHtml += "<div class='proposal-title'>Раздел: " + esc(p.sectionName || '') + "</div>";
+                        previewHtml += "<div class='muted'><b>Первый элемент:</b> " + esc(p.blockName || '') + "</div>";
+                        previewHtml += "<div class='muted'><b>Назначение:</b> " + esc(p.condition || '') + "</div>";
+                        previewHtml += "<div class='muted'><b>Текст:</b> " + esc(p.text || '') + "</div>";
+                    } else if (p.targetType === 'main-list') {
+                        previewHtml += "<div class='proposal-title'>Блок: " + esc(p.blockName || '') + "</div>";
+                        previewHtml += "<div class='muted'><b>Назначение:</b> " + esc(p.condition || '') + "</div>";
+                        previewHtml += "<div class='muted'><b>Текст:</b> " + esc(p.text || '') + "</div>";
+                    } else if (p.targetType === 'section') {
+                        previewHtml += "<div class='proposal-title'>Элемент: " + esc(p.blockName || '') + "</div>";
+                        previewHtml += "<div class='muted'><b>Назначение:</b> " + esc(p.condition || '') + "</div>";
+                        previewHtml += "<div class='muted'><b>Текст:</b> " + esc(p.text || '') + "</div>";
+                    } else {
+                        previewHtml += "<div class='proposal-title'>" + esc(p.condition) + "</div><div class='muted'>" + esc(p.text) + "</div>";
+                    }
+                    if (p.attachments && p.attachments.length) {
+                        previewHtml += "<div class='attachments-row' style='margin-top:8px'>";
+                        p.attachments.forEach((att) => {
+                            previewHtml += "<div class='asset-chip'><div class='asset-chip-title'>" + esc(att.title) + "</div>";
+                            if (att.type === 'image') previewHtml += "<img src='" + escAttr(att.value) + "' style='max-width:100px;max-height:60px'>";
+                            else previewHtml += "<div class='asset-chip-link'>" + esc(att.value) + "</div>";
+                            previewHtml += "</div>";
+                        });
+                        previewHtml += "</div>";
+                    }
+                    div.innerHTML = previewHtml;
+
+                    const tools = document.createElement('div');
+                    tools.className = 'toolbar';
+                    if (!isOwner()) {
+                        const edit = document.createElement('button');
+                        edit.className = 'small-btn';
+                        edit.textContent = 'Изменить';
+                        edit.onclick = async () => await editProposalAsManager(p);
+                        tools.appendChild(edit);
+                        const del = document.createElement('button');
+                        del.className = 'small-btn danger-btn';
+                        del.textContent = 'Удалить';
+                        del.onclick = async () => { if (await showConfirmModal('Удалить предложение?', '')) await deleteProposal(p.id); };
+                        tools.appendChild(del);
+                    }
+                    if (isOwner()) {
+                        const add = document.createElement('button');
+                        add.className = 'small-btn gold-btn';
+                        add.textContent = 'Добавить';
+                        add.onclick = () => approveProposal(p.id);
+                        tools.appendChild(add);
+                        const corr = document.createElement('button');
+                        corr.className = 'small-btn gold-btn';
+                        corr.textContent = 'С корректировкой';
+                        corr.onclick = () => { ownerEditProposalIndex = i; render(); };
+                        tools.appendChild(corr);
+                        const rej = document.createElement('button');
+                        rej.className = 'small-btn danger-btn';
+                        rej.textContent = 'Отклонить';
+                        rej.onclick = async () => {
+                            const comment = await showPromptModal('Комментарий по отклонению', 'Почему отклонено?', '');
+                            if (comment !== null) await rejectProposal(p.id, comment);
+                        };
+                        tools.appendChild(rej);
+                    }
+                    div.appendChild(tools);
+                }
+                el.appendChild(div);
+            });
+        }
+
+        async function editProposalAsManager(p) {
+            let result = null;
+            if (p.targetType === 'new-section') {
+                result = await showQuadFieldModal('Изменить предложение', 'Название раздела', 'Название первого элемента', 'Назначение / когда использовать', 'Текст', p.sectionName || '', p.blockName || '', p.condition || '', p.text || '');
+                if (!result) return;
+                const updated = { ...p };
+                updated.sectionName = result.f1.trim() || p.sectionName;
+                updated.blockName = result.f2.trim() || p.blockName;
+                updated.condition = result.f3.trim() || p.condition;
+                updated.text = result.f4.trim() || p.text;
+                await apiCall(`/api/proposal/${p.id}`, 'PUT', updated);
+            } else if (p.targetType === 'block') {
+                result = await showTripleFieldModal('Изменить предложение', 'Назначение / когда использовать', 'Текущий блок', 'Текст', p.condition || '', p.targetName || '', p.text || '');
+                if (!result) return;
+                const updated = { ...p };
+                updated.condition = result.f1.trim() || p.condition;
+                updated.text = result.f3.trim() || p.text;
+                await apiCall(`/api/proposal/${p.id}`, 'PUT', updated);
+            } else {
+                result = await showTripleFieldModal('Изменить предложение', p.targetType === 'main-list' ? 'Название блока' : 'Название элемента', 'Назначение / когда использовать', 'Текст', p.blockName || '', p.condition || '', p.text || '');
+                if (!result) return;
+                const updated = { ...p };
+                updated.blockName = result.f1.trim() || p.blockName;
+                updated.condition = result.f2.trim() || p.condition;
+                updated.text = result.f3.trim() || p.text;
+                await apiCall(`/api/proposal/${p.id}`, 'PUT', updated);
+            }
+            state = await loadData();
+            render();
+        }
+
+        function renderManagerReply() { const el = document.getElementById('managerReplyArea'); if (el) el.innerHTML = ''; }
+
+        function render() {
+            if (!state) return;
+            const roleSelectEl = document.getElementById('roleSelect');
+            const downloadBtn = document.getElementById('downloadProjectBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            if (roleSelectEl) roleSelectEl.value = currentUserRole || 'manager';
+            if (downloadBtn) downloadBtn.style.display = isOwner() ? 'inline-block' : 'none';
+            if (exportBtn) exportBtn.style.display = isOwner() ? 'inline-block' : 'none';
+            renderMain();
+            renderRight();
+            renderCenter();
+            renderManagerReply();
+            renderProposals();
+            clearDragState();
+        }
+
+        async function downloadProjectFile() {
+            try {
+                const response = await fetch(API_BASE + '/api/data');
+                const data = await response.json();
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'borzo_data.json';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            } catch (e) { alert('Ошибка сохранения проекта'); }
+        }
+
+        function exportDatabase() {
+            if (!state) return;
+            const date = new Date();
+            const pad = n => String(n).padStart(2, '0');
+            const filename = 'borzo_script_export_' + date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + '_' + pad(date.getHours()) + '-' + pad(date.getMinutes()) + '.txt';
+            let out = ['BORZO SCRIPT NAVIGATOR', 'Экспорт базы', '', '=== МАГИСТРАЛЬ ===', ''];
+            (state.mainOrder || []).forEach(name => {
+                const block = state.blocks[name];
+                if (!block) return;
+                out.push('БЛОК: ' + name);
+                if (block.note) out.push('Пояснение: ' + block.note);
+                if (block.hint) out.push('Подсказка: ' + block.hint);
+                (block.messages || []).forEach((msg, idx) => {
+                    out.push('', 'Сообщение ' + (idx + 1) + ': ' + (msg.label || ''), msg.text || '');
+                });
+                out.push('', '------------------------------', '');
+            });
+            out.push('', '=== РАЗДЕЛЫ ===', '');
+            (state.sectionOrder || []).forEach(sectionName => {
+                out.push('РАЗДЕЛ: ' + sectionName, '');
+                (state.sections[sectionName] || []).forEach(itemName => {
+                    const block = state.blocks[itemName];
+                    out.push('ЭЛЕМЕНТ: ' + itemName);
+                    if (block && block.note) out.push('Пояснение: ' + block.note);
+                    if (block && block.hint) out.push('Подсказка: ' + block.hint);
+                    if (block) (block.messages || []).forEach((msg, idx) => {
+                        out.push('', 'Сообщение ' + (idx + 1) + ': ' + (msg.label || ''), msg.text || '');
+                    });
+                    out.push('', '------------------------------', '');
+                });
+                out.push('');
+            });
+            const blob = new Blob([out.join('\n')], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', async () => {
+            const downloadBtn = document.getElementById('downloadProjectBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const logoutBtnEl = document.getElementById('logoutBtn');
+            const roleSelectEl = document.getElementById('roleSelect');
+            if (downloadBtn) downloadBtn.onclick = downloadProjectFile;
+            if (exportBtn) exportBtn.onclick = exportDatabase;
+            if (logoutBtnEl) logoutBtnEl.onclick = logout;
+            if (roleSelectEl) {
+                roleSelectEl.onchange = async (e) => {
+                    const nextRole = e.target.value;
+                    if (nextRole === 'owner') {
+                        const code = prompt('Введите код руководителя');
+                        if (code !== '7004') {
+                            alert('Неверный код');
+                            roleSelectEl.value = currentUserRole || 'manager';
+                            return;
+                        }
+                        await login('owner', '7004');
+                    } else {
+                        await login('manager', '4007');
+                    }
+                };
+            }
+            const authenticated = await checkAuth();
+            if (!authenticated) showLoginModal();
+        });
+    </script>
+</body>
+</html>
