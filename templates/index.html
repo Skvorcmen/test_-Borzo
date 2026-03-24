@@ -1325,6 +1325,8 @@
 
         // ГЛАВНАЯ ИСПРАВЛЕННАЯ ФУНКЦИЯ
         async function saveAttachment(messageIndex) {
+            console.log("=== saveAttachment called ===");
+
             const titleEl = document.getElementById('asset-title-' + messageIndex);
             const typeEl = document.getElementById('asset-type-' + messageIndex);
             const valueEl = document.getElementById('asset-value-' + messageIndex);
@@ -1356,21 +1358,35 @@
             if (!msg.attachments) msg.attachments = [];
             msg.attachments.push({ title, type, value });
 
-            const response = await fetch('/api/data', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(state)
-            });
+            console.log("Attachment added, saving...");
 
-            if (response.ok) {
-                assetEditIndex = null;
-                const dataRes = await fetch('/api/data');
-                state = await dataRes.json();
-                render();
-            } else {
+            try {
+                const response = await fetch(API_BASE + '/api/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(state)
+                });
+
+                console.log("Response status:", response.status);
+
+                if (response.ok) {
+                    console.log("Save successful!");
+                    assetEditIndex = null;
+                    // Перезагружаем данные с сервера
+                    const dataRes = await fetch(API_BASE + '/api/data');
+                    state = await dataRes.json();
+                    render();
+                } else {
+                    console.error("Save failed with status:", response.status);
+                    msg.attachments.pop();
+                    renderCenter();
+                    alert("Ошибка сохранения: " + response.status);
+                }
+            } catch (e) {
+                console.error("Save error:", e);
+                alert("Ошибка сохранения: " + e.message);
                 msg.attachments.pop();
                 renderCenter();
-                alert("Ошибка сохранения");
             }
         }
 
