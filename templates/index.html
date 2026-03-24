@@ -1525,12 +1525,7 @@
             });
         }
 
-        // Проверить, что saveAttachment существует
-        console.log(typeof saveAttachment);
-
-        // Временно заменить saveAttachment на версию с принудительным логированием
-        window.saveAttachment = async function(messageIndex) {
-            console.log("!!! saveAttachment called !!!");
+        async function saveAttachment(messageIndex) {
             const titleEl = document.getElementById('asset-title-' + messageIndex);
             const typeEl = document.getElementById('asset-type-' + messageIndex);
             const valueEl = document.getElementById('asset-value-' + messageIndex);
@@ -1546,11 +1541,7 @@
             }
 
             if (type === 'image' && fileEl && fileEl.files && fileEl.files[0]) {
-                const reader = new FileReader();
-                value = await new Promise((resolve) => {
-                    reader.onload = () => resolve(reader.result);
-                    reader.readAsDataURL(fileEl.files[0]);
-                });
+                value = await readFileAsDataURL(fileEl.files[0]);
             }
 
             if (!value) {
@@ -1562,28 +1553,30 @@
             if (!msg.attachments) msg.attachments = [];
             msg.attachments.push({ title, type, value });
 
-            console.log("Attachment added, now saving via fetch...");
-
-            // Прямой вызов fetch для сохранения
+            // Явно вызываем сохранение
             try {
                 const response = await fetch('/api/data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(state)
                 });
-                console.log("Fetch response status:", response.status);
+
                 if (response.ok) {
-                    console.log("Data saved successfully!");
                     assetEditIndex = null;
+                    // Перезагружаем данные с сервера
+                    const dataResponse = await fetch('/api/data');
+                    state = await dataResponse.json();
                     render();
                 } else {
-                    console.error("Save failed with status:", response.status);
+                    throw new Error('Save failed');
                 }
             } catch (e) {
-                console.error("Save error:", e);
+                console.error('Save error:', e);
+                alert('Ошибка сохранения');
+                msg.attachments.pop();
+                renderCenter();
             }
         }
-
         function removeAttachment(messageIndex, attachmentIndex) {
             const msg = state.blocks[state.currentBlock].messages[messageIndex];
             if (msg.attachments) {
