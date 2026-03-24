@@ -1348,7 +1348,7 @@
                 targetName: state.currentBlock,
                 condition: condition,
                 text: text,
-                attachments: attachments, // Передаем вложения
+                attachments: attachments,
                 mode: 'replace',
                 sourceIndex: i
             });
@@ -1726,6 +1726,24 @@
                         editHtml += "<input id='owner-prop-condition-" + i + "' class='input' value='" + escAttr(p.condition || '') + "' placeholder='Назначение / когда использовать'>";
                     }
                     editHtml += "<textarea id='owner-prop-text-" + i + "' class='textarea' placeholder='Текст'>" + esc(p.text || '') + "</textarea>";
+
+                    // Показываем вложения в режиме редактирования
+                    if (p.attachments && p.attachments.length) {
+                        editHtml += "<div class='attachments-row' style='margin-top:8px'>";
+                        p.attachments.forEach((att, idx) => {
+                            editHtml += "<div class='asset-chip' style='width:100%'>";
+                            editHtml += "<div class='asset-chip-title'>" + esc(att.title || 'Вложение') + "</div>";
+                            editHtml += "<div class='asset-chip-preview'>";
+                            if (att.type === 'image') {
+                                editHtml += "<img src='" + escAttr(att.value || '') + "' style='max-width:100px;max-height:60px'>";
+                            } else {
+                                editHtml += "<div class='asset-chip-link'>" + esc(att.value || '') + "</div>";
+                            }
+                            editHtml += "</div></div>";
+                        });
+                        editHtml += "</div>";
+                    }
+
                     div.innerHTML = editHtml;
 
                     const tools = document.createElement('div');
@@ -1784,7 +1802,9 @@
 
                     div.appendChild(tools);
                 } else {
+                    // Обычный просмотр предложения
                     let previewHtml = "<div class='muted' style='margin-bottom:6px'>" + esc(target) + "</div>";
+
                     if (p.targetType === 'new-section') {
                         previewHtml += "<div class='proposal-title'>Раздел: " + esc(p.sectionName || '') + "</div>";
                         previewHtml += "<div class='muted' style='line-height:1.45;margin-bottom:4px'><b>Первый элемент:</b> " + esc(p.blockName || '') + "</div>";
@@ -1799,96 +1819,10 @@
                         previewHtml += "<div class='muted' style='line-height:1.45;margin-bottom:4px'><b>Назначение:</b> " + esc(p.condition || '') + "</div>";
                         previewHtml += "<div class='muted' style='line-height:1.45'><b>Текст:</b> " + esc(p.text || '') + "</div>";
                     } else {
-                        let previewHtml = "<div class='muted' style='margin-bottom:6px'>" + esc(target) + "</div>";
-                        if (p.targetType === 'new-section') {
-                            previewHtml += "<div class='proposal-title'>Раздел: " + esc(p.sectionName || '') + "</div>";
-                            previewHtml += "<div class='muted' style='line-height:1.45;margin-bottom:4px'><b>Первый элемент:</b> " + esc(p.blockName || '') + "</div>";
-                            previewHtml += "<div class='muted' style='line-height:1.45;margin-bottom:4px'><b>Назначение:</b> " + esc(p.condition || '') + "</div>";
-                            previewHtml += "<div class='muted' style='line-height:1.45'><b>Текст:</b> " + esc(p.text || '') + "</div>";
-                        } else if (p.targetType === 'main-list') {
-                            previewHtml += "<div class='proposal-title'>Блок: " + esc(p.blockName || '') + "</div>";
-                            previewHtml += "<div class='muted' style='line-height:1.45;margin-bottom:4px'><b>Назначение:</b> " + esc(p.condition || '') + "</div>";
-                            previewHtml += "<div class='muted' style='line-height:1.45'><b>Текст:</b> " + esc(p.text || '') + "</div>";
-                        } else if (p.targetType === 'section') {
-                            previewHtml += "<div class='proposal-title'>Элемент: " + esc(p.blockName || '') + "</div>";
-                            previewHtml += "<div class='muted' style='line-height:1.45;margin-bottom:4px'><b>Назначение:</b> " + esc(p.condition || '') + "</div>";
-                            previewHtml += "<div class='muted' style='line-height:1.45'><b>Текст:</b> " + esc(p.text || '') + "</div>";
-                        } else {
-                            previewHtml += "<div class='proposal-title'>" + esc(p.condition) + "</div><div class='muted' style='line-height:1.45'>" + esc(p.text) + "</div>";
-                        }
-
-                        // Добавляем вложения (внутрь previewHtml)
-                        if (p.attachments && p.attachments.length) {
-                            previewHtml += "<div class='attachments-row' style='margin-top:8px'>";
-                            p.attachments.forEach((att, idx) => {
-                                previewHtml += "<div class='asset-chip' style='width:100%'>";
-                                previewHtml += "<div class='asset-chip-title'>" + esc(att.title || 'Вложение') + "</div>";
-                                previewHtml += "<div class='asset-chip-preview'>";
-                                if (att.type === 'image') {
-                                    previewHtml += "<img src='" + escAttr(att.value || '') + "' style='max-width:100px;max-height:60px'>";
-                                } else {
-                                    previewHtml += "<div class='asset-chip-link'>" + esc(att.value || '') + "</div>";
-                                }
-                                previewHtml += "</div></div>";
-                            });
-                            previewHtml += "</div>";
-                        }
-
-                        div.innerHTML = previewHtml;
-
-                        const tools = document.createElement('div');
-                        tools.className = 'toolbar';
-
-                        if (!isOwner()) {
-                            const edit = document.createElement('button');
-                            edit.className = 'small-btn';
-                            edit.textContent = 'Изменить';
-                            edit.onclick = async () => await editProposalAsManager(p);
-                            tools.appendChild(edit);
-
-                            const del = document.createElement('button');
-                            del.className = 'small-btn danger-btn';
-                            del.textContent = 'Удалить';
-                            del.onclick = async () => {
-                                const ok = await showConfirmModal('Удалить предложение?', 'Предложение будет удалено из списка.');
-                                if (ok) {
-                                    await deleteProposal(p.id);
-                                }
-                            };
-                            tools.appendChild(del);
-                        }
-
-                        if (isOwner()) {
-                            const add = document.createElement('button');
-                            add.className = 'small-btn gold-btn';
-                            add.textContent = 'Добавить';
-                            add.onclick = () => approveProposal(p.id);
-                            tools.appendChild(add);
-
-                            const corr = document.createElement('button');
-                            corr.className = 'small-btn gold-btn';
-                            corr.textContent = 'С корректировкой';
-                            corr.onclick = () => {
-                                ownerEditProposalIndex = i;
-                                render();
-                            };
-                            tools.appendChild(corr);
-
-                            const rej = document.createElement('button');
-                            rej.className = 'small-btn danger-btn';
-                            rej.textContent = 'Отклонить';
-                            rej.onclick = async () => {
-                                const comment = await showPromptModal('Комментарий по отклонению', 'Почему отклонено?', '');
-                                if (comment !== null) {
-                                    await rejectProposal(p.id, comment);
-                                }
-                            };
-                            tools.appendChild(rej);
-                        }
-
-                        div.appendChild(tools);
+                        previewHtml += "<div class='proposal-title'>" + esc(p.condition) + "</div><div class='muted' style='line-height:1.45'>" + esc(p.text) + "</div>";
                     }
-                    div.innerHTML = previewHtml;
+
+                    // Добавляем вложения (ВАЖНО: внутри previewHtml, перед установкой innerHTML)
                     if (p.attachments && p.attachments.length) {
                         previewHtml += "<div class='attachments-row' style='margin-top:8px'>";
                         p.attachments.forEach((att, idx) => {
@@ -1905,6 +1839,7 @@
                         previewHtml += "</div>";
                     }
 
+                    div.innerHTML = previewHtml;
 
                     const tools = document.createElement('div');
                     tools.className = 'toolbar';
