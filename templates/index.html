@@ -1276,6 +1276,42 @@
             render();
         }
 
+        // Скачать изображение
+        function downloadImage(messageIndex, attachmentIndex) {
+            const msg = state.blocks[state.currentBlock].messages[messageIndex];
+            const att = msg.attachments[attachmentIndex];
+            if (!att || att.type !== 'image') return;
+
+            // Создаем ссылку для скачивания
+            const link = document.createElement('a');
+            link.href = att.value;
+            link.download = `${att.title || 'image'}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            alert(`Изображение "${att.title}" скачано!`);
+        }
+
+        // Копировать ссылку
+        async function copyLink(messageIndex, attachmentIndex) {
+            const msg = state.blocks[state.currentBlock].messages[messageIndex];
+            const att = msg.attachments[attachmentIndex];
+            if (!att || att.type !== 'link') return;
+
+            try {
+                await navigator.clipboard.writeText(att.value);
+                alert("Ссылка скопирована!");
+            } catch (err) {
+                const textarea = document.createElement('textarea');
+                textarea.value = att.value;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert("Ссылка скопирована!");
+            }
+        }
+
         function renderAttachmentsHtml(msg, i) {
             const assets = msg.attachments || [];
             let html = "<div class='material-row'><button class='small-btn' onclick='toggleAttachmentEditor(" + i + ")'>Материалы</button><div class='drag-handle' draggable='true' data-drag-handle='" + i + "' title='Перетащить'>⋮⋮</div></div>";
@@ -1285,10 +1321,21 @@
                     html += "<div class='asset-chip'>";
                     html += "<div class='asset-chip-title'>" + esc(att.title || '') + "</div>";
                     html += "<div class='asset-chip-preview'>";
-                    if (att.type === 'image') html += "<img src='" + escAttr(att.value || '') + "'>";
-                    else html += "<div class='asset-chip-link'>" + esc(att.value || '') + "</div>";
+                    if (att.type === 'image') {
+                        html += "<img src='" + escAttr(att.value || '') + "'>";
+                    } else {
+                        html += "<div class='asset-chip-link'>" + esc(att.value || '') + "</div>";
+                    }
                     html += "</div>";
-                    html += "<div class='toolbar' style='margin-top:0'><button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='copyAttachment(" + i + "," + idx + ")'>Копировать</button>";
+                    html += "<div class='toolbar' style='margin-top:0'>";
+
+                    // Для изображений - кнопка "Скачать", для ссылок - "Копировать"
+                    if (att.type === 'image') {
+                        html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='downloadImage(" + i + "," + idx + ")'>Скачать</button>";
+                    } else {
+                        html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='copyLink(" + i + "," + idx + ")'>Копировать</button>";
+                    }
+
                     html += "<button class='small-btn danger-btn' style='font-size:11px;padding:4px 8px' onclick='removeAttachment(" + i + "," + idx + ")'>Удалить</button></div>";
                     html += "</div>";
                 });
