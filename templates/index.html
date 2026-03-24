@@ -1414,36 +1414,19 @@
             const att = msg.attachments[attachmentIndex];
             if (!att) return;
 
+            // Всегда копируем URL (для изображений это data:image URL)
             try {
-                if (att.type === 'image') {
-                    // Для изображений - копируем изображение
-                    const response = await fetch(att.value);
-                    const blob = await response.blob();
-                    await navigator.clipboard.write([
-                        new ClipboardItem({
-                            [blob.type]: blob
-                        })
-                    ]);
-                    alert("Изображение скопировано!");
-                } else {
-                    // Для ссылок - копируем текст
-                    await navigator.clipboard.writeText(att.value);
-                    alert("Ссылка скопирована!");
-                }
+                await navigator.clipboard.writeText(att.value);
+                alert("Ссылка скопирована в буфер обмена!");
             } catch (err) {
-                console.error('Ошибка копирования:', err);
-                // Fallback для старых браузеров
-                if (att.type === 'link') {
-                    const textarea = document.createElement('textarea');
-                    textarea.value = att.value;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                    alert("Ссылка скопирована!");
-                } else {
-                    alert("Не удалось скопировать изображение");
-                }
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = att.value;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert("Ссылка скопирована!");
             }
         }
 
