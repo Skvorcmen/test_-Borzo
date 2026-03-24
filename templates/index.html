@@ -1282,17 +1282,17 @@
             const att = msg.attachments[attachmentIndex];
             if (!att || att.type !== 'image') return;
 
-            // Создаем ссылку для скачивания
             const link = document.createElement('a');
             link.href = att.value;
             link.download = `${att.title || 'image'}.png`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            alert(`Изображение "${att.title}" скачано!`);
-        }
+            alert(`📁 Изображение "${att.title}" скачано!`);
 
-        // Копировать ссылку
+
+
+                // Копировать ссылку
         async function copyLink(messageIndex, attachmentIndex) {
             const msg = state.blocks[state.currentBlock].messages[messageIndex];
             const att = msg.attachments[attachmentIndex];
@@ -1300,7 +1300,7 @@
 
             try {
                 await navigator.clipboard.writeText(att.value);
-                alert("Ссылка скопирована!");
+                alert("🔗 Ссылка скопирована!");
             } catch (err) {
                 const textarea = document.createElement('textarea');
                 textarea.value = att.value;
@@ -1308,9 +1308,10 @@
                 textarea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textarea);
-                alert("Ссылка скопирована!");
+                alert("🔗 Ссылка скопирована!");
             }
         }
+
 
         function renderAttachmentsHtml(msg, i) {
             const assets = msg.attachments || [];
@@ -1331,6 +1332,7 @@
 
                     // Для изображений - кнопка "Скачать", для ссылок - "Копировать"
                     if (att.type === 'image') {
+                        html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='copyImage(" + i + "," + idx + ")'>Копировать</button>";
                         html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='downloadImage(" + i + "," + idx + ")'>Скачать</button>";
                     } else {
                         html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='copyLink(" + i + "," + idx + ")'>Копировать</button>";
