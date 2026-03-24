@@ -1,1334 +1,1386 @@
 <!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BORZO - Script Navigator</title>
-    <link rel="icon" href="data:,">
-    <style>
-        :root {
-            --bg: #3a3a3a;
-            --bg2: #474747;
-            --panel: #f8f7f3;
-            --white: #fff;
-            --line: #ddd8cf;
-            --text: #222;
-            --muted: #6f6a63;
-            --gold: #c9a24a;
-            --gold2: #a9852f;
-            --goldsoft: #f7edd6;
-            --bluesoft: #edf4ff;
-            --danger: #c64c4c;
-            --green: #189c54;
-        }
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BORZO - Script Navigator</title>
+        <link rel="icon" href="data:,">
+        <style>
+            :root {
+                --bg: #3a3a3a;
+                --bg2: #474747;
+                --panel: #f8f7f3;
+                --white: #fff;
+                --line: #ddd8cf;
+                --text: #222;
+                --muted: #6f6a63;
+                --gold: #c9a24a;
+                --gold2: #a9852f;
+                --goldsoft: #f7edd6;
+                --bluesoft: #edf4ff;
+                --danger: #c64c4c;
+                --green: #189c54;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                font-family: Arial, Helvetica, sans-serif;
+                background: linear-gradient(180deg, var(--bg), var(--bg2));
+                color: var(--text);
+            }
+
+            header {
+                height: 82px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 16px 22px;
+                background: rgba(20, 20, 20, .18);
+                border-bottom: 1px solid rgba(201, 162, 74, .35);
+            }
+
+            .brand {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+            }
+
+            .logo {
+                border: 2px solid var(--gold);
+                color: var(--gold);
+                padding: 6px 14px;
+                border-radius: 8px;
+                font-weight: 800;
+                letter-spacing: 2px;
+                font-size: 28px;
+                background: #2f2f2f;
+            }
+
+            .header-title {
+                font-size: 20px;
+                font-weight: 700;
+                color: #fff;
+            }
+
+            .header-sub {
+                font-size: 12px;
+                color: #ddd;
+                margin-top: 4px;
+            }
+
+            .role-select {
+                border: 1px solid rgba(201, 162, 74, .45);
+                background: #2f2f2f;
+                color: #fff;
+                border-radius: 10px;
+                padding: 10px 12px;
+            }
 
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(180deg, var(--bg), var(--bg2));
-            color: var(--text);
-        }
-
-        header {
-            height: 82px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 22px;
-            background: rgba(20, 20, 20, .18);
-            border-bottom: 1px solid rgba(201, 162, 74, .35);
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .logo {
-            border: 2px solid var(--gold);
-            color: var(--gold);
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            font-size: 28px;
-            background: #2f2f2f;
-        }
-
-        .header-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .header-sub {
-            font-size: 12px;
-            color: #ddd;
-            margin-top: 4px;
-        }
-
-        .role-select {
-            border: 1px solid rgba(201, 162, 74, .45);
-            background: #2f2f2f;
-            color: #fff;
-            border-radius: 10px;
-            padding: 10px 12px;
-        }
-
-        .layout {
-            display: grid;
-            grid-template-columns: 300px 1fr 340px;
-            gap: 16px;
-            padding: 16px;
-            min-height: calc(100vh - 82px);
-        }
-
-        .panel {
-            background: var(--panel);
-            border: 1px solid rgba(255, 255, 255, .16);
-            border-radius: 18px;
-            padding: 16px;
-            box-shadow: 0 10px 28px rgba(0, 0, 0, .15);
-        }
-
-        .white {
-            background: var(--white);
-        }
-
-        .section-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .section-title {
-            font-size: 22px;
-            font-weight: 800;
-        }
-
-        .muted {
-            font-size: 12px;
-            color: var(--muted);
-        }
-
-        .list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .item {
-            border: 1px solid var(--line);
-            background: #fff;
-            border-radius: 12px;
-            padding: 12px 14px;
-            transition: all .15s ease;
-            cursor: pointer;
-        }
-
-        .item:hover {
-            border-color: var(--gold);
-            background: #fffaf1;
-        }
-
-        .item.active {
-            border-color: var(--gold);
-            background: #fff7e8;
-            box-shadow: 0 0 0 2px rgba(201, 162, 74, .12) inset;
-        }
-
-        .item-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .item-title {
-            flex: 1;
-            font-weight: 700;
-        }
-
-        .hidden-actions {
-            display: flex;
-            gap: 6px;
-            min-width: 74px;
-            justify-content: flex-end;
-            visibility: hidden;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .item:hover .hidden-actions,
-        .item.active .hidden-actions,
-        .item.show .hidden-actions {
-            visibility: visible;
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .input, .textarea, .item-input {
-            width: 100%;
-            border: 1px solid #d7d2c7;
-            border-radius: 10px;
-            padding: 10px 12px;
-            background: #fff;
-            font: inherit;
-        }
-
-        .textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .icon-btn, .small-btn, .copy-btn {
-            border: 1px solid var(--line);
-            background: #fff;
-            border-radius: 10px;
-            cursor: pointer;
-            font: inherit;
-        }
-
-        .icon-btn {
-            width: 34px;
-            height: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .small-btn {
-            padding: 10px 12px;
-            font-size: 13px;
-        }
-
-        .copy-btn {
-            min-height: 48px;
-            min-width: 148px;
-            padding: 12px 20px;
-            font-size: 16px;
-            font-weight: 800;
-            background: var(--gold);
-            border-color: var(--gold2);
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(201, 162, 74, .18);
-        }
-
-        .gold-btn {
-            background: var(--gold);
-            border-color: var(--gold2);
-            color: #fff;
-        }
-
-        .danger-btn {
-            color: var(--danger);
-        }
-
-        .return-btn {
-            background: var(--danger);
-            border-color: #b54444;
-            color: #fff;
-            font-size: 20px;
-            font-weight: 800;
-            padding: 16px 20px;
-            min-width: 320px;
-        }
-
-        .center-title {
-            font-size: 34px;
-            font-weight: 800;
-            margin-bottom: 4px;
-        }
-
-        .center-sub {
-            font-size: 18px;
-            font-weight: 800;
-            margin-bottom: 14px;
-        }
-
-        .center-sub.main {
-            color: var(--green);
-        }
-
-        .center-sub.side {
-            color: var(--muted);
-        }
-
-        .info-box {
-            border-radius: 14px;
-            padding: 12px 14px;
-            margin-bottom: 12px;
-            line-height: 1.45;
-        }
-
-        .gold-box {
-            background: var(--goldsoft);
-            border: 1px solid #ead39f;
-        }
-
-        .blue-box {
-            background: var(--bluesoft);
-            border: 1px solid #c7d8ff;
-        }
-
-        .card {
-            border: 2px solid #2f3237;
-            background: #ffffff;
-            border-radius: 14px;
-            padding: 14px;
-            margin-bottom: 14px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, .06);
-        }
-
-        .card-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-
-        .card-body {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .card-text {
-            white-space: pre-wrap;
-            line-height: 1.62;
-            font-size: 18px;
-            color: #2a2a2a;
-            user-select: text;
-        }
-
-        .card-label {
-            font-size: 12px;
-            font-weight: 900;
-            color: var(--gold2);
-            text-transform: uppercase;
-            letter-spacing: .6px;
-        }
-
-        .toolbar {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-
-        .divider {
-            height: 1px;
-            background: #e7e3da;
-            margin: 14px 0;
-        }
-
-        .empty {
-            padding: 14px;
-            border: 1px dashed #cfcac0;
-            border-radius: 12px;
-            background: #fff;
-            color: var(--muted);
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 22px;
-            height: 22px;
-            padding: 0 7px;
-            border-radius: 999px;
-            background: var(--danger);
-            color: #fff;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .proposal-card {
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            padding: 12px;
-            background: #fff;
-            margin-bottom: 8px;
-        }
-
-        .proposal-title {
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .attachments-row {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 6px 0 2px 0;
-            margin-top: 8px;
-        }
-
-        .asset-chip {
-            min-width: 120px;
-            max-width: 140px;
-            border: 1px solid #d7d2c7;
-            border-radius: 10px;
-            padding: 6px;
-            background: #fafafa;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .asset-chip-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: #444;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .asset-chip-preview {
-            height: 60px;
-            border: 1px solid #ece7dc;
-            border-radius: 8px;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            padding: 4px;
-        }
-
-        .asset-chip-preview img {
-            max-width: 100%;
-            max-height: 100%;
-            display: block;
-            border-radius: 8px;
-        }
-
-        .asset-chip-link {
-            font-size: 11px;
-            line-height: 1.3;
-            color: #555;
-            word-break: break-all;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-        }
-
-        .asset-editor {
-            margin-top: 10px;
-            border-top: 1px solid #e7e3da;
-            padding-top: 10px;
-        }
-
-        .asset-editor-grid {
-            display: grid;
-            grid-template-columns: 1fr 120px;
-            gap: 8px;
-        }
-
-        .asset-file {
-            font: inherit;
-        }
-
-        .drag-handle {
-            width: 28px;
-            height: 28px;
-            border: 1px solid var(--line);
-            border-radius: 6px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            background: #fff;
-            color: #666;
-            cursor: grab;
-            user-select: none;
-        }
-
-        .drag-handle:active {
-            cursor: grabbing;
-        }
-
-        .material-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .app-modal-backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, .45);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        .app-modal-backdrop.show {
-            display: flex;
-        }
-
-        .app-modal {
-            width: min(560px, calc(100vw - 32px));
-            background: #fff;
-            border-radius: 16px;
-            border: 1px solid var(--line);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, .25);
-            padding: 16px;
-        }
-
-        .app-modal-title {
-            font-size: 20px;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
-
-        .app-modal-text {
-            font-size: 14px;
-            color: var(--muted);
-            margin-bottom: 10px;
-        }
-
-        .app-modal-input,
-        .app-modal-textarea {
-            width: 100%;
-            border: 1px solid #d7d2c7;
-            border-radius: 10px;
-            padding: 10px 12px;
-            background: #fff;
-            font: inherit;
-        }
-
-        .app-modal-textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .app-modal-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-            margin-top: 12px;
-        }
-
-        .login-modal .role-buttons {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .login-modal .role-btn {
-            flex: 1;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            border-radius: 12px;
-            cursor: pointer;
-            border: 1px solid var(--line);
-            background: #fff;
-            transition: all 0.2s;
-        }
-
-        .login-modal .role-btn.active {
-            background: var(--gold);
-            border-color: var(--gold2);
-            color: #fff;
-        }
-
-        .login-modal .password-field {
-            display: none;
-        }
-
-        .login-modal .password-field.show {
-            display: block;
-        }
-
-        @media (max-width:1150px) {
             .layout {
-                grid-template-columns: 1fr;
+                display: grid;
+                grid-template-columns: 300px 1fr 340px;
+                gap: 16px;
+                padding: 16px;
+                min-height: calc(100vh - 82px);
             }
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <div class="brand">
-            <div class="logo">BORZO</div>
-            <div>
-                <div class="header-title">Script Navigator</div>
-                <div class="header-sub">Внутренний навигатор скриптов</div>
-            </div>
-        </div>
-        <div style="display: flex; gap: 8px; align-items: center;">
-            <button id="downloadProjectBtn" class="small-btn gold-btn" style="display: none;">Скачать проект</button>
-            <button id="exportBtn" class="small-btn gold-btn" style="display: none;">Экспорт базы</button>
-            <select id="roleSelect" class="role-select">
-                <option value="manager">Менеджер</option>
-                <option value="owner">Руководитель</option>
-            </select>
-            <button id="logoutBtn" class="small-btn" style="background:#2f2f2f; border-color:#666; color:#fff;">Выйти</button>
-        </div>
-    </header>
 
-    <div class="layout">
-        <aside class="panel">
-            <div class="section-head">
-                <div class="section-title">Магистраль</div>
-            </div>
-            <div id="mainList" class="list"></div>
-            <div class="divider"></div>
-            <div class="section-head">
-                <div class="section-title" style="font-size:18px">Предложения</div>
-                <div id="propBadge"></div>
-            </div>
-            <div id="managerReplyArea" class="list"></div>
-            <div id="proposalList" class="list"></div>
-        </aside>
-
-        <main class="panel white">
-            <div id="center"></div>
-        </main>
-
-        <aside class="panel">
-            <div id="right"></div>
-        </aside>
-    </div>
-
-    <div id="appModalBackdrop" class="app-modal-backdrop">
-        <div class="app-modal">
-            <div id="appModalTitle" class="app-modal-title"></div>
-            <div id="appModalText" class="app-modal-text"></div>
-            <div id="appModalFields"></div>
-            <div class="app-modal-actions" id="appModalActions"></div>
-        </div>
-    </div>
-
-    <script>
-        // API URL
-        const API_BASE = '';
-
-        // Глобальное состояние
-        let state = null;
-        let currentUserRole = null;
-        let editBlockName = null;
-        let editSectionName = null;
-        let editMessageIndex = null;
-        let inlineProposalIndex = null;
-        let ownerEditProposalIndex = null;
-        let assetEditIndex = null;
-        let messageShown = false;
-
-        // Утилиты
-        const esc = s => String(s || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
-        const escAttr = s => esc(s).replaceAll('"', '&quot;');
-        const escJs = s => String(s || '').replaceAll('\\', '\\\\').replaceAll("'", "\\'");
-
-        async function apiCall(url, method, data = null) {
-            const options = {
-                method: method,
-                headers: { 'Content-Type': 'application/json' }
-            };
-            if (data) options.body = JSON.stringify(data);
-            const response = await fetch(API_BASE + url, options);
-            if (!response.ok) {
-                const error = await response.json().catch(() => ({}));
-                throw new Error(error.error || 'Ошибка запроса');
+            .panel {
+                background: var(--panel);
+                border: 1px solid rgba(255, 255, 255, .16);
+                border-radius: 18px;
+                padding: 16px;
+                box-shadow: 0 10px 28px rgba(0, 0, 0, .15);
             }
-            return response.json();
-        }
 
-        async function loadData() {
-            try {
-                console.log("Loading data...");
-                const response = await fetch(API_BASE + '/api/data');
+            .white {
+                background: var(--white);
+            }
+
+            .section-head {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 12px;
+            }
+
+            .section-title {
+                font-size: 22px;
+                font-weight: 800;
+            }
+
+            .muted {
+                font-size: 12px;
+                color: var(--muted);
+            }
+
+            .list {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .item {
+                border: 1px solid var(--line);
+                background: #fff;
+                border-radius: 12px;
+                padding: 12px 14px;
+                transition: all .15s ease;
+                cursor: pointer;
+            }
+
+            .item:hover {
+                border-color: var(--gold);
+                background: #fffaf1;
+            }
+
+            .item.active {
+                border-color: var(--gold);
+                background: #fff7e8;
+                box-shadow: 0 0 0 2px rgba(201, 162, 74, .12) inset;
+            }
+
+            .item-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+            .item-title {
+                flex: 1;
+                font-weight: 700;
+            }
+
+            .hidden-actions {
+                display: flex;
+                gap: 6px;
+                min-width: 74px;
+                justify-content: flex-end;
+                visibility: hidden;
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            .item:hover .hidden-actions,
+            .item.active .hidden-actions,
+            .item.show .hidden-actions {
+                visibility: visible;
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .input, .textarea, .item-input {
+                width: 100%;
+                border: 1px solid #d7d2c7;
+                border-radius: 10px;
+                padding: 10px 12px;
+                background: #fff;
+                font: inherit;
+            }
+
+            .textarea {
+                min-height: 120px;
+                resize: vertical;
+            }
+
+            .icon-btn, .small-btn, .copy-btn {
+                border: 1px solid var(--line);
+                background: #fff;
+                border-radius: 10px;
+                cursor: pointer;
+                font: inherit;
+            }
+
+            .icon-btn {
+                width: 34px;
+                height: 34px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+            }
+
+            .small-btn {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+
+            .copy-btn {
+                min-height: 48px;
+                min-width: 148px;
+                padding: 12px 20px;
+                font-size: 16px;
+                font-weight: 800;
+                background: var(--gold);
+                border-color: var(--gold2);
+                color: #fff;
+                box-shadow: 0 4px 12px rgba(201, 162, 74, .18);
+            }
+
+            .gold-btn {
+                background: var(--gold);
+                border-color: var(--gold2);
+                color: #fff;
+            }
+
+            .danger-btn {
+                color: var(--danger);
+            }
+
+            .return-btn {
+                background: var(--danger);
+                border-color: #b54444;
+                color: #fff;
+                font-size: 20px;
+                font-weight: 800;
+                padding: 16px 20px;
+                min-width: 320px;
+            }
+
+            .center-title {
+                font-size: 34px;
+                font-weight: 800;
+                margin-bottom: 4px;
+            }
+
+            .center-sub {
+                font-size: 18px;
+                font-weight: 800;
+                margin-bottom: 14px;
+            }
+
+            .center-sub.main {
+                color: var(--green);
+            }
+
+            .center-sub.side {
+                color: var(--muted);
+            }
+
+            .info-box {
+                border-radius: 14px;
+                padding: 12px 14px;
+                margin-bottom: 12px;
+                line-height: 1.45;
+            }
+
+            .gold-box {
+                background: var(--goldsoft);
+                border: 1px solid #ead39f;
+            }
+
+            .blue-box {
+                background: var(--bluesoft);
+                border: 1px solid #c7d8ff;
+            }
+
+            .card {
+                border: 2px solid #2f3237;
+                background: #ffffff;
+                border-radius: 14px;
+                padding: 14px;
+                margin-bottom: 14px;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, .06);
+            }
+
+            .card-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                margin-bottom: 10px;
+                flex-wrap: wrap;
+            }
+
+            .card-body {
+                flex: 1;
+                min-width: 0;
+            }
+
+            .card-text {
+                white-space: pre-wrap;
+                line-height: 1.62;
+                font-size: 18px;
+                color: #2a2a2a;
+                user-select: text;
+            }
+
+            .card-label {
+                font-size: 12px;
+                font-weight: 900;
+                color: var(--gold2);
+                text-transform: uppercase;
+                letter-spacing: .6px;
+            }
+
+            .toolbar {
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+                margin-top: 10px;
+            }
+
+            .divider {
+                height: 1px;
+                background: #e7e3da;
+                margin: 14px 0;
+            }
+
+            .empty {
+                padding: 14px;
+                border: 1px dashed #cfcac0;
+                border-radius: 12px;
+                background: #fff;
+                color: var(--muted);
+            }
+
+            .badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 22px;
+                height: 22px;
+                padding: 0 7px;
+                border-radius: 999px;
+                background: var(--danger);
+                color: #fff;
+                font-size: 12px;
+                font-weight: 700;
+            }
+
+            .proposal-card {
+                border: 1px solid var(--line);
+                border-radius: 14px;
+                padding: 12px;
+                background: #fff;
+                margin-bottom: 8px;
+            }
+
+            .proposal-title {
+                font-weight: 700;
+                margin-bottom: 6px;
+            }
+
+            .attachments-row {
+                display: flex;
+                gap: 10px;
+                overflow-x: auto;
+                padding: 6px 0 2px 0;
+                margin-top: 8px;
+            }
+
+            .asset-chip {
+                min-width: 120px;
+                max-width: 140px;
+                border: 1px solid #d7d2c7;
+                border-radius: 10px;
+                padding: 6px;
+                background: #fafafa;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .asset-chip-title {
+                font-size: 12px;
+                font-weight: 700;
+                color: #444;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .asset-chip-preview {
+                height: 60px;
+                border: 1px solid #ece7dc;
+                border-radius: 8px;
+                background: #fff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                padding: 4px;
+            }
+
+            .asset-chip-preview img {
+                max-width: 100%;
+                max-height: 100%;
+                display: block;
+                border-radius: 8px;
+            }
+
+            .asset-chip-link {
+                font-size: 11px;
+                line-height: 1.3;
+                color: #555;
+                word-break: break-all;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+            }
+
+            .asset-editor {
+                margin-top: 10px;
+                border-top: 1px solid #e7e3da;
+                padding-top: 10px;
+            }
+
+            .asset-editor-grid {
+                display: grid;
+                grid-template-columns: 1fr 120px;
+                gap: 8px;
+            }
+
+            .asset-file {
+                font: inherit;
+            }
+
+            .drag-handle {
+                width: 28px;
+                height: 28px;
+                border: 1px solid var(--line);
+                border-radius: 6px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                background: #fff;
+                color: #666;
+                cursor: grab;
+                user-select: none;
+            }
+
+            .drag-handle:active {
+                cursor: grabbing;
+            }
+
+            .material-row {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 12px;
+            }
+
+            .app-modal-backdrop {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, .45);
+                display: none;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            }
+
+            .app-modal-backdrop.show {
+                display: flex;
+            }
+
+            .app-modal {
+                width: min(560px, calc(100vw - 32px));
+                background: #fff;
+                border-radius: 16px;
+                border: 1px solid var(--line);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, .25);
+                padding: 16px;
+            }
+
+            .app-modal-title {
+                font-size: 20px;
+                font-weight: 800;
+                margin-bottom: 10px;
+            }
+
+            .app-modal-text {
+                font-size: 14px;
+                color: var(--muted);
+                margin-bottom: 10px;
+            }
+
+            .app-modal-input,
+            .app-modal-textarea {
+                width: 100%;
+                border: 1px solid #d7d2c7;
+                border-radius: 10px;
+                padding: 10px 12px;
+                background: #fff;
+                font: inherit;
+            }
+
+            .app-modal-textarea {
+                min-height: 120px;
+                resize: vertical;
+            }
+
+            .app-modal-actions {
+                display: flex;
+                gap: 8px;
+                justify-content: flex-end;
+                flex-wrap: wrap;
+                margin-top: 12px;
+            }
+
+            .login-modal .role-buttons {
+                display: flex;
+                gap: 12px;
+                margin-bottom: 16px;
+            }
+
+            .login-modal .role-btn {
+                flex: 1;
+                padding: 12px;
+                font-size: 16px;
+                font-weight: 700;
+                border-radius: 12px;
+                cursor: pointer;
+                border: 1px solid var(--line);
+                background: #fff;
+                transition: all 0.2s;
+            }
+
+            .login-modal .role-btn.active {
+                background: var(--gold);
+                border-color: var(--gold2);
+                color: #fff;
+            }
+
+            .login-modal .password-field {
+                display: none;
+            }
+
+            .login-modal .password-field.show {
+                display: block;
+            }
+
+            @media (max-width:1150px) {
+                .layout {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div class="brand">
+                <div class="logo">BORZO</div>
+                <div>
+                    <div class="header-title">Script Navigator</div>
+                    <div class="header-sub">Внутренний навигатор скриптов</div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button id="downloadProjectBtn" class="small-btn gold-btn" style="display: none;">Скачать проект</button>
+                <button id="exportBtn" class="small-btn gold-btn" style="display: none;">Экспорт базы</button>
+                <select id="roleSelect" class="role-select">
+                    <option value="manager">Менеджер</option>
+                    <option value="owner">Руководитель</option>
+                </select>
+                <button id="logoutBtn" class="small-btn" style="background:#2f2f2f; border-color:#666; color:#fff;">Выйти</button>
+            </div>
+        </header>
+
+        <div class="layout">
+            <aside class="panel">
+                <div class="section-head">
+                    <div class="section-title">Магистраль</div>
+                </div>
+                <div id="mainList" class="list"></div>
+                <div class="divider"></div>
+                <div class="section-head">
+                    <div class="section-title" style="font-size:18px">Предложения</div>
+                    <div id="propBadge"></div>
+                </div>
+                <div id="managerReplyArea" class="list"></div>
+                <div id="proposalList" class="list"></div>
+            </aside>
+
+            <main class="panel white">
+                <div id="center"></div>
+            </main>
+
+            <aside class="panel">
+                <div id="right"></div>
+            </aside>
+        </div>
+
+        <div id="appModalBackdrop" class="app-modal-backdrop">
+            <div class="app-modal">
+                <div id="appModalTitle" class="app-modal-title"></div>
+                <div id="appModalText" class="app-modal-text"></div>
+                <div id="appModalFields"></div>
+                <div class="app-modal-actions" id="appModalActions"></div>
+            </div>
+        </div>
+
+        <script>
+            // API URL
+            const API_BASE = '';
+
+            // Глобальное состояние
+            let state = null;
+            let currentUserRole = null;
+            let editBlockName = null;
+            let editSectionName = null;
+            let editMessageIndex = null;
+            let inlineProposalIndex = null;
+            let ownerEditProposalIndex = null;
+            let assetEditIndex = null;
+            let messageShown = false;
+
+            // Утилиты
+            const esc = s => String(s || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+            const escAttr = s => esc(s).replaceAll('"', '&quot;');
+            const escJs = s => String(s || '').replaceAll('\\', '\\\\').replaceAll("'", "\\'");
+
+            async function apiCall(url, method, data = null) {
+                const options = {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' }
+                };
+                if (data) options.body = JSON.stringify(data);
+                const response = await fetch(API_BASE + url, options);
                 if (!response.ok) {
-                    if (response.status === 401) {
-                        showLoginModal();
-                        return null;
+                    const error = await response.json().catch(() => ({}));
+                    throw new Error(error.error || 'Ошибка запроса');
+                }
+                return response.json();
+            }
+
+            async function loadData() {
+                try {
+                    console.log("Loading data...");
+                    const response = await fetch(API_BASE + '/api/data');
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            showLoginModal();
+                            return null;
+                        }
+                        throw new Error('Ошибка загрузки данных');
                     }
-                    throw new Error('Ошибка загрузки данных');
+                    return await response.json();
+                } catch (e) {
+                    console.error(e);
+                    return null;
                 }
-                return await response.json();
-            } catch (e) {
-                console.error(e);
-                return null;
             }
-        }
 
-        async function saveData(data) {
-            try {
-                console.log("Saving data...");
-                const response = await fetch(API_BASE + '/api/data', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                console.log("Response status:", response.status);
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Ошибка сохранения');
-                }
-                return true;
-            } catch (e) {
-                console.error('Save error:', e);
-                alert('Ошибка сохранения: ' + e.message);
-                return false;
-            }
-        }
-
-        async function saveDataAndRender() {
-            const success = await saveData(state);
-            if (success) {
-                state = await loadData();
-                render();
-            }
-        }
-
-        async function checkAuth() {
-            try {
-                const response = await fetch(API_BASE + '/api/check');
-                const data = await response.json();
-                if (data.role) {
-                    currentUserRole = data.role;
-                    state = await loadData();
-                    if (state) {
-                        render();
-                        startMessagePolling();
+            async function saveData(data) {
+                try {
+                    console.log("Saving data...");
+                    const response = await fetch(API_BASE + '/api/data', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    console.log("Response status:", response.status);
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Ошибка сохранения');
                     }
                     return true;
+                } catch (e) {
+                    console.error('Save error:', e);
+                    alert('Ошибка сохранения: ' + e.message);
+                    return false;
                 }
-                return false;
-            } catch (e) {
-                return false;
             }
-        }
 
-        async function login(role, password) {
-            try {
-                const data = await apiCall('/api/login', 'POST', { role, password });
-                if (data.success) {
-                    currentUserRole = data.role;
+            async function saveDataAndRender() {
+                const success = await saveData(state);
+                if (success) {
+                    state = await loadData();
+                    render();
+                }
+            }
+
+            async function checkAuth() {
+                try {
+                    const response = await fetch(API_BASE + '/api/check');
+                    const data = await response.json();
+                    if (data.role) {
+                        currentUserRole = data.role;
+                        state = await loadData();
+                        if (state) {
+                            render();
+                            startMessagePolling();
+                        }
+                        return true;
+                    }
+                    return false;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            async function login(role, password) {
+                try {
+                    const data = await apiCall('/api/login', 'POST', { role, password });
+                    if (data.success) {
+                        currentUserRole = data.role;
+                        state = await loadData();
+                        render();
+                        return true;
+                    }
+                    return false;
+                } catch (e) {
+                    alert('Ошибка входа: ' + e.message);
+                    return false;
+                }
+            }
+
+            async function logout() {
+                try {
+                    await apiCall('/api/logout', 'POST');
+                    currentUserRole = null;
+                    state = null;
+                    showLoginModal();
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            async function addProposal(proposal) {
+                try {
+                    await apiCall('/api/proposal', 'POST', proposal);
                     state = await loadData();
                     render();
                     return true;
+                } catch (e) {
+                    alert('Ошибка отправки предложения: ' + e.message);
+                    return false;
                 }
-                return false;
-            } catch (e) {
-                alert('Ошибка входа: ' + e.message);
-                return false;
             }
-        }
 
-        async function logout() {
-            try {
-                await apiCall('/api/logout', 'POST');
-                currentUserRole = null;
-                state = null;
-                showLoginModal();
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        async function addProposal(proposal) {
-            try {
-                await apiCall('/api/proposal', 'POST', proposal);
-                state = await loadData();
-                render();
-                return true;
-            } catch (e) {
-                alert('Ошибка отправки предложения: ' + e.message);
-                return false;
-            }
-        }
-
-        async function approveProposal(proposalId) {
-            try {
-                await apiCall(`/api/proposal/${proposalId}/approve`, 'POST');
-                state = await loadData();
-                render();
-                return true;
-            } catch (e) {
-                alert('Ошибка: ' + e.message);
-                return false;
-            }
-        }
-
-        async function rejectProposal(proposalId, comment) {
-            try {
-                await apiCall(`/api/proposal/${proposalId}/reject`, 'POST', { comment });
-                state = await loadData();
-                render();
-                return true;
-            } catch (e) {
-                alert('Ошибка: ' + e.message);
-                return false;
-            }
-        }
-
-        async function deleteProposal(proposalId) {
-            try {
-                await apiCall(`/api/proposal/${proposalId}`, 'DELETE');
-                state = await loadData();
-                render();
-                return true;
-            } catch (e) {
-                alert('Ошибка: ' + e.message);
-                return false;
-            }
-        }
-
-        async function checkMessages() {
-            if (currentUserRole !== 'manager') return;
-            if (messageShown) return; // Не показываем, если уже показано
-
-            try {
-                const data = await apiCall('/api/messages', 'GET');
-                if (data.messages && data.messages.length) {
-                    messageShown = true;
-
-                    // Показываем ВСЕ сообщения (может быть несколько)
-                    for (const msg of data.messages) {
-                        await showAlertModal('Ответ от руководителя', msg.text);
-                    }
-
-                    // Обновляем данные
+            async function approveProposal(proposalId) {
+                try {
+                    await apiCall(`/api/proposal/${proposalId}/approve`, 'POST');
                     state = await loadData();
-                    if (state) {
-                        render();
+                    render();
+                    return true;
+                } catch (e) {
+                    alert('Ошибка: ' + e.message);
+                    return false;
+                }
+            }
+
+            async function rejectProposal(proposalId, comment) {
+                try {
+                    await apiCall(`/api/proposal/${proposalId}/reject`, 'POST', { comment });
+                    state = await loadData();
+                    render();
+                    return true;
+                } catch (e) {
+                    alert('Ошибка: ' + e.message);
+                    return false;
+                }
+            }
+
+            async function deleteProposal(proposalId) {
+                try {
+                    await apiCall(`/api/proposal/${proposalId}`, 'DELETE');
+                    state = await loadData();
+                    render();
+                    return true;
+                } catch (e) {
+                    alert('Ошибка: ' + e.message);
+                    return false;
+                }
+            }
+
+            async function checkMessages() {
+                if (currentUserRole !== 'manager') return;
+                if (messageShown) return; // Не показываем, если уже показано
+
+                try {
+                    const data = await apiCall('/api/messages', 'GET');
+                    if (data.messages && data.messages.length) {
+                        messageShown = true;
+
+                        // Показываем ВСЕ сообщения (может быть несколько)
+                        for (const msg of data.messages) {
+                            await showAlertModal('Ответ от руководителя', msg.text);
+                        }
+
+                        // Обновляем данные
+                        state = await loadData();
+                        if (state) {
+                            render();
+                        }
+
+                        // Сбрасываем флаг через 3 секунды, чтобы новые сообщения могли быть показаны
+                        setTimeout(() => {
+                            messageShown = false;
+                        }, 3000);
                     }
-
-                    // Сбрасываем флаг через 3 секунды, чтобы новые сообщения могли быть показаны
-                    setTimeout(() => {
-                        messageShown = false;
-                    }, 3000);
+                } catch (e) {
+                    console.error(e);
                 }
-            } catch (e) {
-                console.error(e);
             }
-        }
 
-        let messageInterval = null;
-        function startMessagePolling() {
-            if (messageInterval) clearInterval(messageInterval);
-            if (currentUserRole === 'manager') {
-                messageInterval = setInterval(checkMessages, 10000);
+            let messageInterval = null;
+            function startMessagePolling() {
+                if (messageInterval) clearInterval(messageInterval);
+                if (currentUserRole === 'manager') {
+                    messageInterval = setInterval(checkMessages, 10000);
+                }
             }
-        }
 
-        function isOwner() {
-            return currentUserRole === 'owner';
-        }
+            function isOwner() {
+                return currentUserRole === 'owner';
+            }
 
-        function openBlock(name) {
-            state.currentBlock = name;
-            if (state.blocks[name] && state.blocks[name].kind === 'main') state.lastMain = name;
-            editBlockName = null;
-            editSectionName = null;
-            editMessageIndex = null;
-            inlineProposalIndex = null;
-            render();
-        }
+            function openBlock(name) {
+                state.currentBlock = name;
+                if (state.blocks[name] && state.blocks[name].kind === 'main') state.lastMain = name;
+                editBlockName = null;
+                editSectionName = null;
+                editMessageIndex = null;
+                inlineProposalIndex = null;
+                render();
+            }
 
-        function returnToMain() {
-            state.currentBlock = state.lastMain || state.mainOrder[0];
-            inlineProposalIndex = null;
-            render();
-        }
+            function returnToMain() {
+                state.currentBlock = state.lastMain || state.mainOrder[0];
+                inlineProposalIndex = null;
+                render();
+            }
 
-        async function createProposal(targetType, targetName) {
-            let result = null;
-            if (targetType === 'main-list') {
-                result = await showTripleFieldModal('Предложить блок', 'Название блока', 'Назначение / когда использовать', 'Текст первого сообщения');
+            async function createProposal(targetType, targetName) {
+                let result = null;
+                if (targetType === 'main-list') {
+                    result = await showTripleFieldModal('Предложить блок', 'Название блока', 'Назначение / когда использовать', 'Текст первого сообщения');
+                    if (!result) return;
+                    if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim()) return;
+                    await addProposal({
+                        id: Date.now() + Math.random(),
+                        targetType: targetType,
+                        targetName: targetName,
+                        blockName: result.f1.trim(),
+                        condition: result.f2.trim(),
+                        text: result.f3.trim(),
+                        attachments: []
+                    });
+                    return;
+                }
+                if (targetType === 'section') {
+                    result = await showTripleFieldModal('Предложить элемент', 'Название элемента', 'Назначение / когда использовать', 'Текст первого сообщения');
+                    if (!result) return;
+                    if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim()) return;
+                    await addProposal({
+                        id: Date.now() + Math.random(),
+                        targetType: targetType,
+                        targetName: targetName,
+                        blockName: result.f1.trim(),
+                        condition: result.f2.trim(),
+                        text: result.f3.trim(),
+                        attachments: []
+                    });
+                    return;
+                }
+                if (targetType === 'new-section') {
+                    result = await showQuadFieldModal('Предложить раздел', 'Название раздела', 'Название первого элемента', 'Назначение / когда использовать', 'Текст первого сообщения');
+                    if (!result) return;
+                    if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim() || !result.f4.trim()) return;
+                    await addProposal({
+                        id: Date.now() + Math.random(),
+                        targetType: targetType,
+                        targetName: targetName,
+                        sectionName: result.f1.trim(),
+                        blockName: result.f2.trim(),
+                        condition: result.f3.trim(),
+                        text: result.f4.trim(),
+                        attachments: []
+                    });
+                    return;
+                }
+                result = await showTripleFieldModal('Предложить изменение', 'Назначение / когда использовать', 'Текущий блок', 'Текст ответа', '', targetName || '', '');
                 if (!result) return;
-                if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim()) return;
+                if (!result.f1.trim() || !result.f3.trim()) return;
                 await addProposal({
                     id: Date.now() + Math.random(),
-                    targetType: targetType,
-                    targetName: targetName,
-                    blockName: result.f1.trim(),
-                    condition: result.f2.trim(),
+                    targetType: 'block',
+                    targetName: state.currentBlock,
+                    condition: result.f1.trim(),
                     text: result.f3.trim(),
                     attachments: []
                 });
-                return;
             }
-            if (targetType === 'section') {
-                result = await showTripleFieldModal('Предложить элемент', 'Название элемента', 'Назначение / когда использовать', 'Текст первого сообщения');
-                if (!result) return;
-                if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim()) return;
-                await addProposal({
-                    id: Date.now() + Math.random(),
-                    targetType: targetType,
-                    targetName: targetName,
-                    blockName: result.f1.trim(),
-                    condition: result.f2.trim(),
-                    text: result.f3.trim(),
-                    attachments: []
-                });
-                return;
+
+            function moveItemInArray(arr, fromIndex, toIndex) {
+                if (!Array.isArray(arr)) return;
+                if (fromIndex === toIndex) return;
+                const item = arr.splice(fromIndex, 1)[0];
+                arr.splice(toIndex, 0, item);
+                saveDataAndRender();
             }
-            if (targetType === 'new-section') {
-                result = await showQuadFieldModal('Предложить раздел', 'Название раздела', 'Название первого элемента', 'Назначение / когда использовать', 'Текст первого сообщения');
-                if (!result) return;
-                if (!result.f1.trim() || !result.f2.trim() || !result.f3.trim() || !result.f4.trim()) return;
-                await addProposal({
-                    id: Date.now() + Math.random(),
-                    targetType: targetType,
-                    targetName: targetName,
-                    sectionName: result.f1.trim(),
-                    blockName: result.f2.trim(),
-                    condition: result.f3.trim(),
-                    text: result.f4.trim(),
-                    attachments: []
-                });
-                return;
+
+            // Drag and drop handlers
+            let dragState = null;
+            function startDrag(type, payload) { dragState = { type, ...payload }; }
+            function clearDragState() { dragState = null; document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
+            function handleMainDrop(targetName) {
+                if (!dragState || dragState.type !== 'main') return;
+                const fromIndex = state.mainOrder.indexOf(dragState.name);
+                const toIndex = state.mainOrder.indexOf(targetName);
+                moveItemInArray(state.mainOrder, fromIndex, toIndex);
+                clearDragState();
             }
-            result = await showTripleFieldModal('Предложить изменение', 'Назначение / когда использовать', 'Текущий блок', 'Текст ответа', '', targetName || '', '');
-            if (!result) return;
-            if (!result.f1.trim() || !result.f3.trim()) return;
-            await addProposal({
-                id: Date.now() + Math.random(),
-                targetType: 'block',
-                targetName: state.currentBlock,
-                condition: result.f1.trim(),
-                text: result.f3.trim(),
-                attachments: []
-            });
-        }
+            function handleSectionItemDrop(sectionName, targetName) {
+                if (!dragState || dragState.type !== 'section-item' || dragState.sectionName !== sectionName) return;
+                const arr = state.sections[sectionName] || [];
+                const fromIndex = arr.indexOf(dragState.name);
+                const toIndex = arr.indexOf(targetName);
+                moveItemInArray(arr, fromIndex, toIndex);
+                clearDragState();
+            }
+            function handleSectionDrop(targetSection) {
+                if (!dragState || dragState.type !== 'section') return;
+                const fromIndex = state.sectionOrder.indexOf(dragState.sectionName);
+                const toIndex = state.sectionOrder.indexOf(targetSection);
+                moveItemInArray(state.sectionOrder, fromIndex, toIndex);
+                clearDragState();
+            }
+            function handleMessageDrop(targetIndex) {
+                if (!dragState || dragState.type !== 'message') return;
+                const arr = (state.blocks[state.currentBlock] || {}).messages || [];
+                moveItemInArray(arr, dragState.index, targetIndex);
+                clearDragState();
+            }
 
-        function moveItemInArray(arr, fromIndex, toIndex) {
-            if (!Array.isArray(arr)) return;
-            if (fromIndex === toIndex) return;
-            const item = arr.splice(fromIndex, 1)[0];
-            arr.splice(toIndex, 0, item);
-            saveDataAndRender();
-        }
-
-        // Drag and drop handlers
-        let dragState = null;
-        function startDrag(type, payload) { dragState = { type, ...payload }; }
-        function clearDragState() { dragState = null; document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over')); }
-        function handleMainDrop(targetName) {
-            if (!dragState || dragState.type !== 'main') return;
-            const fromIndex = state.mainOrder.indexOf(dragState.name);
-            const toIndex = state.mainOrder.indexOf(targetName);
-            moveItemInArray(state.mainOrder, fromIndex, toIndex);
-            clearDragState();
-        }
-        function handleSectionItemDrop(sectionName, targetName) {
-            if (!dragState || dragState.type !== 'section-item' || dragState.sectionName !== sectionName) return;
-            const arr = state.sections[sectionName] || [];
-            const fromIndex = arr.indexOf(dragState.name);
-            const toIndex = arr.indexOf(targetName);
-            moveItemInArray(arr, fromIndex, toIndex);
-            clearDragState();
-        }
-        function handleSectionDrop(targetSection) {
-            if (!dragState || dragState.type !== 'section') return;
-            const fromIndex = state.sectionOrder.indexOf(dragState.sectionName);
-            const toIndex = state.sectionOrder.indexOf(targetSection);
-            moveItemInArray(state.sectionOrder, fromIndex, toIndex);
-            clearDragState();
-        }
-        function handleMessageDrop(targetIndex) {
-            if (!dragState || dragState.type !== 'message') return;
-            const arr = (state.blocks[state.currentBlock] || {}).messages || [];
-            moveItemInArray(arr, dragState.index, targetIndex);
-            clearDragState();
-        }
-
-        // Модальные окна
-        function closeAppModal() {
-            const backdrop = document.getElementById('appModalBackdrop');
-            backdrop.classList.remove('show');
-            backdrop.className = 'app-modal-backdrop';
-            document.getElementById('appModalTitle').textContent = '';
-            document.getElementById('appModalText').textContent = '';
-            document.getElementById('appModalFields').innerHTML = '';
-            document.getElementById('appModalActions').innerHTML = '';
-        }
-
-        function showPromptModal(title, label, defaultValue = '') {
-            return new Promise(resolve => {
+            // Модальные окна
+            function closeAppModal() {
                 const backdrop = document.getElementById('appModalBackdrop');
-                document.getElementById('appModalTitle').textContent = title || 'Введите значение';
+                backdrop.classList.remove('show');
+                backdrop.className = 'app-modal-backdrop';
+                document.getElementById('appModalTitle').textContent = '';
                 document.getElementById('appModalText').textContent = '';
-                document.getElementById('appModalFields').innerHTML = "<input id='appModalInput' class='app-modal-input' value='" + escAttr(defaultValue || '') + "' placeholder='" + escAttr(label || '') + "'>";
-                const actions = document.getElementById('appModalActions');
-                actions.innerHTML = '';
-                const cancel = document.createElement('button');
-                cancel.className = 'small-btn';
-                cancel.textContent = 'Отмена';
-                cancel.onclick = () => { closeAppModal(); resolve(null); };
-                const ok = document.createElement('button');
-                ok.className = 'small-btn gold-btn';
-                ok.textContent = 'Сохранить';
-                ok.onclick = () => {
-                    const val = document.getElementById('appModalInput').value;
-                    closeAppModal();
-                    resolve(val);
-                };
-                actions.appendChild(cancel);
-                actions.appendChild(ok);
-                backdrop.classList.add('show');
-                setTimeout(() => { const el = document.getElementById('appModalInput'); if (el) { el.focus(); el.select(); } }, 0);
-            });
-        }
-
-        function showConfirmModal(title, textMsg) {
-            return new Promise(resolve => {
-                const backdrop = document.getElementById('appModalBackdrop');
-                document.getElementById('appModalTitle').textContent = title || 'Подтвердите действие';
-                document.getElementById('appModalText').textContent = textMsg || '';
                 document.getElementById('appModalFields').innerHTML = '';
-                const actions = document.getElementById('appModalActions');
-                actions.innerHTML = '';
-                const cancel = document.createElement('button');
-                cancel.className = 'small-btn';
-                cancel.textContent = 'Отмена';
-                cancel.onclick = () => { closeAppModal(); resolve(false); };
-                const ok = document.createElement('button');
-                ok.className = 'small-btn gold-btn';
-                ok.textContent = 'Подтвердить';
-                ok.onclick = () => { closeAppModal(); resolve(true); };
-                actions.appendChild(cancel);
-                actions.appendChild(ok);
-                backdrop.classList.add('show');
-            });
-        }
+                document.getElementById('appModalActions').innerHTML = '';
+            }
 
-        function showAlertModal(title, textMsg) {
-            return new Promise(resolve => {
-                const backdrop = document.getElementById('appModalBackdrop');
-                document.getElementById('appModalTitle').textContent = title || 'Сообщение';
-                document.getElementById('appModalText').textContent = textMsg || '';
-                document.getElementById('appModalFields').innerHTML = '';
-                const actions = document.getElementById('appModalActions');
-                actions.innerHTML = '';
-                const ok = document.createElement('button');
-                ok.className = 'small-btn gold-btn';
-                ok.textContent = 'Ок';
-                ok.onclick = () => { closeAppModal(); resolve(true); };
-                actions.appendChild(ok);
-                backdrop.classList.add('show');
-            });
-        }
+            function showPromptModal(title, label, defaultValue = '') {
+                return new Promise(resolve => {
+                    const backdrop = document.getElementById('appModalBackdrop');
+                    document.getElementById('appModalTitle').textContent = title || 'Введите значение';
+                    document.getElementById('appModalText').textContent = '';
+                    document.getElementById('appModalFields').innerHTML = "<input id='appModalInput' class='app-modal-input' value='" + escAttr(defaultValue || '') + "' placeholder='" + escAttr(label || '') + "'>";
+                    const actions = document.getElementById('appModalActions');
+                    actions.innerHTML = '';
+                    const cancel = document.createElement('button');
+                    cancel.className = 'small-btn';
+                    cancel.textContent = 'Отмена';
+                    cancel.onclick = () => { closeAppModal(); resolve(null); };
+                    const ok = document.createElement('button');
+                    ok.className = 'small-btn gold-btn';
+                    ok.textContent = 'Сохранить';
+                    ok.onclick = () => {
+                        const val = document.getElementById('appModalInput').value;
+                        closeAppModal();
+                        resolve(val);
+                    };
+                    actions.appendChild(cancel);
+                    actions.appendChild(ok);
+                    backdrop.classList.add('show');
+                    setTimeout(() => { const el = document.getElementById('appModalInput'); if (el) { el.focus(); el.select(); } }, 0);
+                });
+            }
 
-        function showTripleFieldModal(title, f1, f2, f3, v1 = '', v2 = '', v3 = '') {
-            return new Promise(resolve => {
+            function showConfirmModal(title, textMsg) {
+                return new Promise(resolve => {
+                    const backdrop = document.getElementById('appModalBackdrop');
+                    document.getElementById('appModalTitle').textContent = title || 'Подтвердите действие';
+                    document.getElementById('appModalText').textContent = textMsg || '';
+                    document.getElementById('appModalFields').innerHTML = '';
+                    const actions = document.getElementById('appModalActions');
+                    actions.innerHTML = '';
+                    const cancel = document.createElement('button');
+                    cancel.className = 'small-btn';
+                    cancel.textContent = 'Отмена';
+                    cancel.onclick = () => { closeAppModal(); resolve(false); };
+                    const ok = document.createElement('button');
+                    ok.className = 'small-btn gold-btn';
+                    ok.textContent = 'Подтвердить';
+                    ok.onclick = () => { closeAppModal(); resolve(true); };
+                    actions.appendChild(cancel);
+                    actions.appendChild(ok);
+                    backdrop.classList.add('show');
+                });
+            }
+
+            function showAlertModal(title, textMsg) {
+                return new Promise(resolve => {
+                    const backdrop = document.getElementById('appModalBackdrop');
+                    document.getElementById('appModalTitle').textContent = title || 'Сообщение';
+                    document.getElementById('appModalText').textContent = textMsg || '';
+                    document.getElementById('appModalFields').innerHTML = '';
+                    const actions = document.getElementById('appModalActions');
+                    actions.innerHTML = '';
+                    const ok = document.createElement('button');
+                    ok.className = 'small-btn gold-btn';
+                    ok.textContent = 'Ок';
+                    ok.onclick = () => { closeAppModal(); resolve(true); };
+                    actions.appendChild(ok);
+                    backdrop.classList.add('show');
+                });
+            }
+
+            function showTripleFieldModal(title, f1, f2, f3, v1 = '', v2 = '', v3 = '') {
+                return new Promise(resolve => {
+                    const backdrop = document.getElementById('appModalBackdrop');
+                    document.getElementById('appModalTitle').textContent = title || '';
+                    document.getElementById('appModalText').textContent = '';
+                    document.getElementById('appModalFields').innerHTML =
+                        "<input id='mf1' class='app-modal-input' placeholder='" + (f1 || 'Поле 1') + "' value='" + escAttr(v1 || '') + "' style='margin-bottom:8px'>" +
+                        "<input id='mf2' class='app-modal-input' placeholder='" + (f2 || 'Поле 2') + "' value='" + escAttr(v2 || '') + "' style='margin-bottom:8px'>" +
+                        "<textarea id='mf3' class='app-modal-textarea' placeholder='" + (f3 || 'Поле 3') + "'>" + esc(v3 || '') + "</textarea>";
+                    const actions = document.getElementById('appModalActions');
+                    actions.innerHTML = '';
+                    const cancel = document.createElement('button');
+                    cancel.className = 'small-btn';
+                    cancel.textContent = 'Отмена';
+                    cancel.onclick = () => { closeAppModal(); resolve(null); };
+                    const ok = document.createElement('button');
+                    ok.className = 'small-btn gold-btn';
+                    ok.textContent = 'Сохранить';
+                    ok.onclick = () => {
+                        const r = { f1: document.getElementById('mf1').value, f2: document.getElementById('mf2').value, f3: document.getElementById('mf3').value };
+                        closeAppModal();
+                        resolve(r);
+                    };
+                    actions.appendChild(cancel);
+                    actions.appendChild(ok);
+                    backdrop.classList.add('show');
+                });
+            }
+
+            function showQuadFieldModal(title, f1, f2, f3, f4, v1 = '', v2 = '', v3 = '', v4 = '') {
+                return new Promise(resolve => {
+                    const backdrop = document.getElementById('appModalBackdrop');
+                    document.getElementById('appModalTitle').textContent = title || '';
+                    document.getElementById('appModalText').textContent = '';
+                    document.getElementById('appModalFields').innerHTML =
+                        "<input id='qf1' class='app-modal-input' placeholder='" + (f1 || 'Поле 1') + "' value='" + escAttr(v1 || '') + "' style='margin-bottom:8px'>" +
+                        "<input id='qf2' class='app-modal-input' placeholder='" + (f2 || 'Поле 2') + "' value='" + escAttr(v2 || '') + "' style='margin-bottom:8px'>" +
+                        "<input id='qf3' class='app-modal-input' placeholder='" + (f3 || 'Поле 3') + "' value='" + escAttr(v3 || '') + "' style='margin-bottom:8px'>" +
+                        "<textarea id='qf4' class='app-modal-textarea' placeholder='" + (f4 || 'Поле 4') + "'>" + esc(v4 || '') + "</textarea>";
+                    const actions = document.getElementById('appModalActions');
+                    actions.innerHTML = '';
+                    const cancel = document.createElement('button');
+                    cancel.className = 'small-btn';
+                    cancel.textContent = 'Отмена';
+                    cancel.onclick = () => { closeAppModal(); resolve(null); };
+                    const ok = document.createElement('button');
+                    ok.className = 'small-btn gold-btn';
+                    ok.textContent = 'Сохранить';
+                    ok.onclick = () => {
+                        const r = { f1: document.getElementById('qf1').value, f2: document.getElementById('qf2').value, f3: document.getElementById('qf3').value, f4: document.getElementById('qf4').value };
+                        closeAppModal();
+                        resolve(r);
+                    };
+                    actions.appendChild(cancel);
+                    actions.appendChild(ok);
+                    backdrop.classList.add('show');
+                });
+            }
+
+            function showLoginModal() {
                 const backdrop = document.getElementById('appModalBackdrop');
-                document.getElementById('appModalTitle').textContent = title || '';
-                document.getElementById('appModalText').textContent = '';
-                document.getElementById('appModalFields').innerHTML =
-                    "<input id='mf1' class='app-modal-input' placeholder='" + (f1 || 'Поле 1') + "' value='" + escAttr(v1 || '') + "' style='margin-bottom:8px'>" +
-                    "<input id='mf2' class='app-modal-input' placeholder='" + (f2 || 'Поле 2') + "' value='" + escAttr(v2 || '') + "' style='margin-bottom:8px'>" +
-                    "<textarea id='mf3' class='app-modal-textarea' placeholder='" + (f3 || 'Поле 3') + "'>" + esc(v3 || '') + "</textarea>";
-                const actions = document.getElementById('appModalActions');
-                actions.innerHTML = '';
-                const cancel = document.createElement('button');
-                cancel.className = 'small-btn';
-                cancel.textContent = 'Отмена';
-                cancel.onclick = () => { closeAppModal(); resolve(null); };
-                const ok = document.createElement('button');
-                ok.className = 'small-btn gold-btn';
-                ok.textContent = 'Сохранить';
-                ok.onclick = () => {
-                    const r = { f1: document.getElementById('mf1').value, f2: document.getElementById('mf2').value, f3: document.getElementById('mf3').value };
-                    closeAppModal();
-                    resolve(r);
+                const modalTitle = document.getElementById('appModalTitle');
+                const modalText = document.getElementById('appModalText');
+                const modalFields = document.getElementById('appModalFields');
+                const modalActions = document.getElementById('appModalActions');
+
+                backdrop.className = 'app-modal-backdrop login-modal show';
+                modalTitle.textContent = 'Вход в систему';
+                modalText.textContent = 'Выберите роль и введите пароль';
+                modalFields.innerHTML = `
+                    <div class="role-buttons">
+                        <button id="loginRoleManager" class="role-btn active">Менеджер</button>
+                        <button id="loginRoleOwner" class="role-btn">Руководитель</button>
+                    </div>
+                    <div id="loginPasswordField" class="password-field show">
+                        <input type="password" id="loginPassword" class="app-modal-input" placeholder="Введите пароль">
+                    </div>
+                `;
+                modalActions.innerHTML = '';
+
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'small-btn';
+                cancelBtn.textContent = 'Отмена';
+                cancelBtn.onclick = () => { closeAppModal(); };
+
+                const loginBtn = document.createElement('button');
+                loginBtn.className = 'small-btn gold-btn';
+                loginBtn.textContent = 'Войти';
+                loginBtn.onclick = async () => {
+                    const selectedRole = document.querySelector('.role-btn.active').textContent;
+                    const password = document.getElementById('loginPassword').value;
+                    const roleKey = selectedRole === 'Менеджер' ? 'manager' : 'owner';
+                    const success = await login(roleKey, password);
+                    if (success) closeAppModal();
+                    else alert('Неверный пароль');
                 };
-                actions.appendChild(cancel);
-                actions.appendChild(ok);
+
+                modalActions.appendChild(cancelBtn);
+                modalActions.appendChild(loginBtn);
                 backdrop.classList.add('show');
-            });
-        }
 
-        function showQuadFieldModal(title, f1, f2, f3, f4, v1 = '', v2 = '', v3 = '', v4 = '') {
-            return new Promise(resolve => {
-                const backdrop = document.getElementById('appModalBackdrop');
-                document.getElementById('appModalTitle').textContent = title || '';
-                document.getElementById('appModalText').textContent = '';
-                document.getElementById('appModalFields').innerHTML =
-                    "<input id='qf1' class='app-modal-input' placeholder='" + (f1 || 'Поле 1') + "' value='" + escAttr(v1 || '') + "' style='margin-bottom:8px'>" +
-                    "<input id='qf2' class='app-modal-input' placeholder='" + (f2 || 'Поле 2') + "' value='" + escAttr(v2 || '') + "' style='margin-bottom:8px'>" +
-                    "<input id='qf3' class='app-modal-input' placeholder='" + (f3 || 'Поле 3') + "' value='" + escAttr(v3 || '') + "' style='margin-bottom:8px'>" +
-                    "<textarea id='qf4' class='app-modal-textarea' placeholder='" + (f4 || 'Поле 4') + "'>" + esc(v4 || '') + "</textarea>";
-                const actions = document.getElementById('appModalActions');
-                actions.innerHTML = '';
-                const cancel = document.createElement('button');
-                cancel.className = 'small-btn';
-                cancel.textContent = 'Отмена';
-                cancel.onclick = () => { closeAppModal(); resolve(null); };
-                const ok = document.createElement('button');
-                ok.className = 'small-btn gold-btn';
-                ok.textContent = 'Сохранить';
-                ok.onclick = () => {
-                    const r = { f1: document.getElementById('qf1').value, f2: document.getElementById('qf2').value, f3: document.getElementById('qf3').value, f4: document.getElementById('qf4').value };
-                    closeAppModal();
-                    resolve(r);
-                };
-                actions.appendChild(cancel);
-                actions.appendChild(ok);
-                backdrop.classList.add('show');
-            });
-        }
+                setTimeout(() => {
+                    const managerBtn = document.getElementById('loginRoleManager');
+                    const ownerBtn = document.getElementById('loginRoleOwner');
+                    const passwordField = document.getElementById('loginPasswordField');
+                    if (managerBtn && ownerBtn) {
+                        managerBtn.onclick = () => { managerBtn.classList.add('active'); ownerBtn.classList.remove('active'); passwordField.classList.add('show'); };
+                        ownerBtn.onclick = () => { ownerBtn.classList.add('active'); managerBtn.classList.remove('active'); passwordField.classList.add('show'); };
+                    }
+                }, 0);
+            }
 
-        function showLoginModal() {
-            const backdrop = document.getElementById('appModalBackdrop');
-            const modalTitle = document.getElementById('appModalTitle');
-            const modalText = document.getElementById('appModalText');
-            const modalFields = document.getElementById('appModalFields');
-            const modalActions = document.getElementById('appModalActions');
-
-            backdrop.className = 'app-modal-backdrop login-modal show';
-            modalTitle.textContent = 'Вход в систему';
-            modalText.textContent = 'Выберите роль и введите пароль';
-            modalFields.innerHTML = `
-                <div class="role-buttons">
-                    <button id="loginRoleManager" class="role-btn active">Менеджер</button>
-                    <button id="loginRoleOwner" class="role-btn">Руководитель</button>
-                </div>
-                <div id="loginPasswordField" class="password-field show">
-                    <input type="password" id="loginPassword" class="app-modal-input" placeholder="Введите пароль">
-                </div>
-            `;
-            modalActions.innerHTML = '';
-
-            const cancelBtn = document.createElement('button');
-            cancelBtn.className = 'small-btn';
-            cancelBtn.textContent = 'Отмена';
-            cancelBtn.onclick = () => { closeAppModal(); };
-
-            const loginBtn = document.createElement('button');
-            loginBtn.className = 'small-btn gold-btn';
-            loginBtn.textContent = 'Войти';
-            loginBtn.onclick = async () => {
-                const selectedRole = document.querySelector('.role-btn.active').textContent;
-                const password = document.getElementById('loginPassword').value;
-                const roleKey = selectedRole === 'Менеджер' ? 'manager' : 'owner';
-                const success = await login(roleKey, password);
-                if (success) closeAppModal();
-                else alert('Неверный пароль');
-            };
-
-            modalActions.appendChild(cancelBtn);
-            modalActions.appendChild(loginBtn);
-            backdrop.classList.add('show');
-
-            setTimeout(() => {
-                const managerBtn = document.getElementById('loginRoleManager');
-                const ownerBtn = document.getElementById('loginRoleOwner');
-                const passwordField = document.getElementById('loginPasswordField');
-                if (managerBtn && ownerBtn) {
-                    managerBtn.onclick = () => { managerBtn.classList.add('active'); ownerBtn.classList.remove('active'); passwordField.classList.add('show'); };
-                    ownerBtn.onclick = () => { ownerBtn.classList.add('active'); managerBtn.classList.remove('active'); passwordField.classList.add('show'); };
+            // Редактирование
+            async function deleteBlock(name) {
+                const ok = await showConfirmModal('Удалить блок?', 'Блок будет удалён из списка.');
+                if (!ok) return;
+                if (Array.isArray(state.mainOrder)) state.mainOrder = state.mainOrder.filter(x => x !== name);
+                if (Array.isArray(state.sectionOrder)) {
+                    state.sectionOrder.forEach(sec => { if (Array.isArray(state.sections[sec])) state.sections[sec] = state.sections[sec].filter(x => x !== name); });
                 }
-            }, 0);
-        }
-
-        // Редактирование
-        async function deleteBlock(name) {
-            const ok = await showConfirmModal('Удалить блок?', 'Блок будет удалён из списка.');
-            if (!ok) return;
-            if (Array.isArray(state.mainOrder)) state.mainOrder = state.mainOrder.filter(x => x !== name);
-            if (Array.isArray(state.sectionOrder)) {
-                state.sectionOrder.forEach(sec => { if (Array.isArray(state.sections[sec])) state.sections[sec] = state.sections[sec].filter(x => x !== name); });
+                if (state.blocks && state.blocks[name]) delete state.blocks[name];
+                if (state.currentBlock === name) state.currentBlock = (state.mainOrder && state.mainOrder[0]) || Object.keys(state.blocks || {})[0] || '';
+                if (state.lastMain === name) state.lastMain = (state.mainOrder && state.mainOrder[0]) || '';
+                saveDataAndRender();
             }
-            if (state.blocks && state.blocks[name]) delete state.blocks[name];
-            if (state.currentBlock === name) state.currentBlock = (state.mainOrder && state.mainOrder[0]) || Object.keys(state.blocks || {})[0] || '';
-            if (state.lastMain === name) state.lastMain = (state.mainOrder && state.mainOrder[0]) || '';
-            saveDataAndRender();
-        }
 
-        async function deleteSection(name) {
-            const ok = await showConfirmModal('Удалить раздел?', 'Раздел и его элементы будут удалены.');
-            if (!ok) return;
-            (state.sections[name] || []).forEach(b => delete state.blocks[b]);
-            delete state.sections[name];
-            state.sectionOrder = state.sectionOrder.filter(x => x !== name);
-            saveDataAndRender();
-        }
-
-        async function deleteMessage(i) {
-            const ok = await showConfirmModal('Удалить сообщение?', 'Сообщение будет удалено.');
-            if (!ok) return;
-            state.blocks[state.currentBlock].messages.splice(i, 1);
-            editMessageIndex = null;
-            saveDataAndRender();
-        }
-
-        function startEditBlock(name) { editBlockName = name; editSectionName = null; render(); }
-        function startEditSection(name) { editSectionName = name; editBlockName = null; render(); }
-        function startEditMessage(i) { editMessageIndex = i; renderCenter(); }
-        function cancelInline() { editBlockName = null; editSectionName = null; render(); }
-        function cancelMessageEdit() { editMessageIndex = null; renderCenter(); }
-
-        function saveBlockName(oldName) {
-            const newName = (document.getElementById('edit-block-name').value || '').trim();
-            if (!newName || newName === oldName) { editBlockName = null; render(); return; }
-            if (state.blocks[newName]) { alert('Такое название уже есть'); return; }
-            state.blocks[newName] = state.blocks[oldName];
-            delete state.blocks[oldName];
-            state.mainOrder = state.mainOrder.map(x => x === oldName ? newName : x);
-            state.sectionOrder.forEach(sec => { state.sections[sec] = state.sections[sec].map(x => x === oldName ? newName : x); });
-            if (state.currentBlock === oldName) state.currentBlock = newName;
-            if (state.lastMain === oldName) state.lastMain = newName;
-            editBlockName = null;
-            saveDataAndRender();
-        }
-
-        function saveSectionName(oldName) {
-            const newName = (document.getElementById('edit-section-name').value || '').trim();
-            if (!newName || newName === oldName) { editSectionName = null; render(); return; }
-            if (state.sections[newName]) { alert('Такой раздел уже есть'); return; }
-            state.sections[newName] = state.sections[oldName];
-            delete state.sections[oldName];
-            state.sectionOrder = state.sectionOrder.map(x => x === oldName ? newName : x);
-            editSectionName = null;
-            saveDataAndRender();
-        }
-
-        function saveMessage(i) {
-            const label = (document.getElementById('edit-msg-label').value || '').trim();
-            const text = (document.getElementById('edit-msg-text').value || '').trim();
-            if (!label || !text) return;
-            const existing = state.blocks[state.currentBlock].messages[i] || {};
-            state.blocks[state.currentBlock].messages[i] = { label, text, attachments: existing.attachments || [] };
-            editMessageIndex = null;
-            saveDataAndRender();
-        }
-
-        function saveMeta() {
-            state.blocks[state.currentBlock].note = (document.getElementById('meta-note').value || '').trim();
-            state.blocks[state.currentBlock].hint = (document.getElementById('meta-hint').value || '').trim();
-            saveDataAndRender();
-        }
-
-        function addOwnerMessage() {
-            const label = (document.getElementById('new-label').value || '').trim();
-            const text = (document.getElementById('new-text').value || '').trim();
-            if (!label || !text) return;
-            state.blocks[state.currentBlock].messages.push({ label, text, attachments: [] });
-            saveDataAndRender();
-        }
-
-        function copyMessage(i) { navigator.clipboard.writeText(state.blocks[state.currentBlock].messages[i].text); }
-
-        function startInlineProposal(i) {
-            inlineProposalIndex = i;
-            window.currentInlineAttachments = state.blocks[state.currentBlock].messages[i].attachments || [];
-            renderCenter();
-        }
-
-        function cancelInlineProposal() { inlineProposalIndex = null; renderCenter(); }
-
-        async function saveInlineProposal(i) {
-            const condition = (document.getElementById('inline-name-' + i).value || '').trim();
-            const text = (document.getElementById('inline-text-' + i).value || '').trim();
-            if (!condition || !text) return;
-            const attachments = window.currentInlineAttachments || [];
-            await addProposal({
-                id: Date.now() + Math.random(),
-                targetType: 'block',
-                targetName: state.currentBlock,
-                condition: condition,
-                text: text,
-                attachments: attachments,
-                mode: 'replace',
-                sourceIndex: i
-            });
-            inlineProposalIndex = null;
-            window.currentInlineAttachments = null;
-            render();
-        }
-
-        async function saveNewVariantProposal() {
-            const condition = (document.getElementById('prop-name').value || '').trim();
-            const text = (document.getElementById('prop-text').value || '').trim();
-            if (!condition || !text) return;
-            await addProposal({
-                id: Date.now() + Math.random(),
-                targetType: 'block',
-                targetName: state.currentBlock,
-                condition: condition,
-                text: text,
-                attachments: []
-            });
-            document.getElementById('prop-name').value = '';
-            document.getElementById('prop-text').value = '';
-            render();
-        }
-
-        // Скачать изображение
-        function downloadImage(messageIndex, attachmentIndex) {
-            const msg = state.blocks[state.currentBlock].messages[messageIndex];
-            const att = msg.attachments[attachmentIndex];
-            if (!att || att.type !== 'image') return;
-
-            const link = document.createElement('a');
-            link.href = att.value;
-            link.download = `${att.title || 'image'}.png`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            alert(`📁 Изображение "${att.title}" скачано!`);
-        }
-        async function copyLink(messageIndex, attachmentIndex) {
-            const msg = state.blocks[state.currentBlock].messages[messageIndex];
-            const att = msg.attachments[attachmentIndex];
-            if (!att || att.type !== 'link') return;
-
-            try {
-                await navigator.clipboard.writeText(att.value);
-                alert("🔗 Ссылка скопирована!");
-            } catch (err) {
-                const textarea = document.createElement('textarea');
-                textarea.value = att.value;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                alert("🔗 Ссылка скопирована!");
+            async function deleteSection(name) {
+                const ok = await showConfirmModal('Удалить раздел?', 'Раздел и его элементы будут удалены.');
+                if (!ok) return;
+                (state.sections[name] || []).forEach(b => delete state.blocks[b]);
+                delete state.sections[name];
+                state.sectionOrder = state.sectionOrder.filter(x => x !== name);
+                saveDataAndRender();
             }
-        }
-        // Копировать изображение в буфер обмена
-        async function copyImage(messageIndex, attachmentIndex) {
-            const msg = state.blocks[state.currentBlock].messages[messageIndex];
-            const att = msg.attachments[attachmentIndex];
-            if (!att || att.type !== 'image') return;
 
-            try {
-                const response = await fetch(att.value);
-                const blob = await response.blob();
-                await navigator.clipboard.write([
-                    new ClipboardItem({
-                        [blob.type]: blob
-                    })
-                ]);
-                alert("✅ Изображение скопировано! Можно вставить (Ctrl+V)");
-            } catch (err) {
-                console.error('Ошибка копирования:', err);
-                alert("❌ Не удалось скопировать изображение. Попробуйте скачать.");
+            async function deleteMessage(i) {
+                const ok = await showConfirmModal('Удалить сообщение?', 'Сообщение будет удалено.');
+                if (!ok) return;
+                state.blocks[state.currentBlock].messages.splice(i, 1);
+                editMessageIndex = null;
+                saveDataAndRender();
             }
-        }
-    </script>
-</body>
+
+            function startEditBlock(name) { editBlockName = name; editSectionName = null; render(); }
+            function startEditSection(name) { editSectionName = name; editBlockName = null; render(); }
+            function startEditMessage(i) { editMessageIndex = i; renderCenter(); }
+            function cancelInline() { editBlockName = null; editSectionName = null; render(); }
+            function cancelMessageEdit() { editMessageIndex = null; renderCenter(); }
+
+            function saveBlockName(oldName) {
+                const newName = (document.getElementById('edit-block-name').value || '').trim();
+                if (!newName || newName === oldName) { editBlockName = null; render(); return; }
+                if (state.blocks[newName]) { alert('Такое название уже есть'); return; }
+                state.blocks[newName] = state.blocks[oldName];
+                delete state.blocks[oldName];
+                state.mainOrder = state.mainOrder.map(x => x === oldName ? newName : x);
+                state.sectionOrder.forEach(sec => { state.sections[sec] = state.sections[sec].map(x => x === oldName ? newName : x); });
+                if (state.currentBlock === oldName) state.currentBlock = newName;
+                if (state.lastMain === oldName) state.lastMain = newName;
+                editBlockName = null;
+                saveDataAndRender();
+            }
+
+            function saveSectionName(oldName) {
+                const newName = (document.getElementById('edit-section-name').value || '').trim();
+                if (!newName || newName === oldName) { editSectionName = null; render(); return; }
+                if (state.sections[newName]) { alert('Такой раздел уже есть'); return; }
+                state.sections[newName] = state.sections[oldName];
+                delete state.sections[oldName];
+                state.sectionOrder = state.sectionOrder.map(x => x === oldName ? newName : x);
+                editSectionName = null;
+                saveDataAndRender();
+            }
+
+            function saveMessage(i) {
+                const label = (document.getElementById('edit-msg-label').value || '').trim();
+                const text = (document.getElementById('edit-msg-text').value || '').trim();
+                if (!label || !text) return;
+                const existing = state.blocks[state.currentBlock].messages[i] || {};
+                state.blocks[state.currentBlock].messages[i] = { label, text, attachments: existing.attachments || [] };
+                editMessageIndex = null;
+                saveDataAndRender();
+            }
+
+            function saveMeta() {
+                state.blocks[state.currentBlock].note = (document.getElementById('meta-note').value || '').trim();
+                state.blocks[state.currentBlock].hint = (document.getElementById('meta-hint').value || '').trim();
+                saveDataAndRender();
+            }
+
+            function addOwnerMessage() {
+                const label = (document.getElementById('new-label').value || '').trim();
+                const text = (document.getElementById('new-text').value || '').trim();
+                if (!label || !text) return;
+                state.blocks[state.currentBlock].messages.push({ label, text, attachments: [] });
+                saveDataAndRender();
+            }
+
+            function copyMessage(i) { navigator.clipboard.writeText(state.blocks[state.currentBlock].messages[i].text); }
+
+            function startInlineProposal(i) {
+                inlineProposalIndex = i;
+                window.currentInlineAttachments = state.blocks[state.currentBlock].messages[i].attachments || [];
+                renderCenter();
+            }
+
+            function cancelInlineProposal() { inlineProposalIndex = null; renderCenter(); }
+
+            async function saveInlineProposal(i) {
+                const condition = (document.getElementById('inline-name-' + i).value || '').trim();
+                const text = (document.getElementById('inline-text-' + i).value || '').trim();
+                if (!condition || !text) return;
+                const attachments = window.currentInlineAttachments || [];
+                await addProposal({
+                    id: Date.now() + Math.random(),
+                    targetType: 'block',
+                    targetName: state.currentBlock,
+                    condition: condition,
+                    text: text,
+                    attachments: attachments,
+                    mode: 'replace',
+                    sourceIndex: i
+                });
+                inlineProposalIndex = null;
+                window.currentInlineAttachments = null;
+                render();
+            }
+
+            async function saveNewVariantProposal() {
+                const condition = (document.getElementById('prop-name').value || '').trim();
+                const text = (document.getElementById('prop-text').value || '').trim();
+                if (!condition || !text) return;
+                await addProposal({
+                    id: Date.now() + Math.random(),
+                    targetType: 'block',
+                    targetName: state.currentBlock,
+                    condition: condition,
+                    text: text,
+                    attachments: []
+                });
+                document.getElementById('prop-name').value = '';
+                document.getElementById('prop-text').value = '';
+                render();
+            }
+
+            // Скачать изображение
+            function downloadImage(messageIndex, attachmentIndex) {
+                const msg = state.blocks[state.currentBlock].messages[messageIndex];
+                const att = msg.attachments[attachmentIndex];
+                if (!att || att.type !== 'image') return;
+
+                const link = document.createElement('a');
+                link.href = att.value;
+                link.download = `${att.title || 'image'}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                alert(`📁 Изображение "${att.title}" скачано!`);
+            }
+            async function copyLink(messageIndex, attachmentIndex) {
+                const msg = state.blocks[state.currentBlock].messages[messageIndex];
+                const att = msg.attachments[attachmentIndex];
+                if (!att || att.type !== 'link') return;
+
+                try {
+                    await navigator.clipboard.writeText(att.value);
+                    alert("🔗 Ссылка скопирована!");
+                } catch (err) {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = att.value;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert("🔗 Ссылка скопирована!");
+                }
+            }
+            // Копировать изображение в буфер обмена
+            async function copyImage(messageIndex, attachmentIndex) {
+                const msg = state.blocks[state.currentBlock].messages[messageIndex];
+                const att = msg.attachments[attachmentIndex];
+                if (!att || att.type !== 'image') return;
+
+                try {
+                    const response = await fetch(att.value);
+                    const blob = await response.blob();
+                    await navigator.clipboard.write([
+                        new ClipboardItem({
+                            [blob.type]: blob
+                        })
+                    ]);
+                    alert("✅ Изображение скопировано! Можно вставить (Ctrl+V)");
+                } catch (err) {
+                    console.error('Ошибка копирования:', err);
+                    alert("❌ Не удалось скопировать изображение. Попробуйте скачать.");
+                }
+            }
+            function renderAttachmentsHtml(msg, i) {
+                const assets = msg.attachments || [];
+                let html = "<div class='material-row'><button class='small-btn' onclick='toggleAttachmentEditor(" + i + ")'>Материалы</button><div class='drag-handle' draggable='true' data-drag-handle='" + i + "' title='Перетащить'>⋮⋮</div></div>";
+                if (assets.length) {
+                    html += "<div class='attachments-row'>";
+                    assets.forEach((att, idx) => {
+                        html += "<div class='asset-chip'>";
+                        html += "<div class='asset-chip-title'>" + esc(att.title || '') + "</div>";
+                        html += "<div class='asset-chip-preview'>";
+                        if (att.type === 'image') {
+                            html += "<img src='" + escAttr(att.value || '') + "'>";
+                        } else {
+                            html += "<div class='asset-chip-link'>" + esc(att.value || '') + "</div>";
+                        }
+                        html += "</div>";
+                        html += "<div class='toolbar' style='margin-top:0'>";
+
+                        if (att.type === 'image') {
+                            html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='copyImage(" + i + "," + idx + ")'>📋 Копировать</button>";
+                            html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='downloadImage(" + i + "," + idx + ")'>💾 Скачать</button>";
+                        } else {
+                            html += "<button class='small-btn gold-btn' style='font-size:11px;padding:4px 8px' onclick='copyLink(" + i + "," + idx + ")'>🔗 Копировать</button>";
+                        }
+
+                        html += "<button class='small-btn danger-btn' style='font-size:11px;padding:4px 8px' onclick='removeAttachment(" + i + "," + idx + ")'>🗑 Удалить</button></div>";
+                        html += "</div>";
+                    });
+                    html += "</div>";
+                }
+                if (assetEditIndex === i) {
+                    html += "<div class='asset-editor'>"
+                        + "<div class='asset-editor-grid'>"
+                        + "<input id='asset-title-" + i + "' class='input' placeholder='Название'>"
+                        + "<select id='asset-type-" + i + "' class='input' onchange='updateAssetFields(" + i + ")'>"
+                        + "<option value='link'>Ссылка</option>"
+                        + "<option value='image'>Фото</option>"
+                        + "</select>"
+                        + "</div>"
+                        + "<div id='asset-fields-" + i + "' style='margin-top:8px'></div>"
+                        + "<div class='toolbar'><button class='small-btn gold-btn' onclick='saveAttachment(" + i + ")'>Добавить</button>"
+                        + "<button class='small-btn' onclick='toggleAttachmentEditor(" + i + ")'>Закрыть</button></div>"
+                        + "</div>";
+                }
+                return html;
+            }
+            function removeAttachment(messageIndex, attachmentIndex) {
+                const msg = state.blocks[state.currentBlock].messages[messageIndex];
+                if (msg.attachments) {
+                    msg.attachments.splice(attachmentIndex, 1);
+                    saveDataAndRender();
+                }
+            }
+        </script>
+    </body>
 </html>
 
