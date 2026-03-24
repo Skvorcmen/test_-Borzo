@@ -631,6 +631,7 @@
         let inlineProposalIndex = null;
         let ownerEditProposalIndex = null;
         let assetEditIndex = null;
+        let messageShown = false;
 
         // Утилиты
         const esc = s => String(s || '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
@@ -777,16 +778,31 @@
             }
         }
 
+
         async function checkMessages() {
             if (currentUserRole !== 'manager') return;
+            if (messageShown) return; // Не показываем, если уже показано
+
             try {
                 const data = await apiCall('/api/messages', 'GET');
                 if (data.messages && data.messages.length) {
-                    data.messages.forEach(msg => {
-                        alert(msg.text);
-                    });
+                    messageShown = true;
+
+                    // Показываем все сообщения
+                    for (const msg of data.messages) {
+                        await showAlertModal('Ответ от руководителя', msg.text);
+                    }
+
+                    // Обновляем данные
                     state = await loadData();
-                    render();
+                    if (state) {
+                        render();
+                    }
+
+                    // Сбрасываем флаг через 3 секунды
+                    setTimeout(() => {
+                        messageShown = false;
+                    }, 3000);
                 }
             } catch (e) {
                 console.error(e);
@@ -795,7 +811,11 @@
 
         let messageInterval = null;
         function startMessagePolling() {
-            if (messageInterval) clearInterval(messageInterval);
+            if (messageInterval) {
+                clearInterval(messageInterval);
+                messageInterval = null;
+            }
+
             if (currentUserRole === 'manager') {
                 messageInterval = setInterval(checkMessages, 10000);
             }
@@ -1860,27 +1880,7 @@
             const el = document.getElementById('managerReplyArea');
             if (!el) return;
             el.innerHTML = '';
-            if (isOwner()) return;
-            if (state.managerMessages && state.managerMessages.length) {
-                const div = document.createElement('div');
-                div.className = 'proposal-card';
-                div.innerHTML = "<div class='proposal-title'>Ответ от руководителя</div><div class='muted'>Есть новый комментарий</div>";
-                const tools = document.createElement('div');
-                tools.className = 'toolbar';
-                const btn = document.createElement('button');
-                btn.className = 'small-btn gold-btn';
-                btn.textContent = 'Открыть';
-                btn.onclick = async () => {
-                    const msgs = [...state.managerMessages];
-                    state.managerMessages = [];
-                    await saveData(state);
-                    msgs.forEach(msg => alert(msg.text));
-                    render();
-                };
-                tools.appendChild(btn);
-                div.appendChild(tools);
-                el.appendChild(div);
-            }
+            // Убираем кнопку "Открыть", чтобы сообщения приходили автоматически
         }
 
         function render() {
