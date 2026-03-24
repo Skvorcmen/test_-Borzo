@@ -1414,18 +1414,41 @@
             const att = msg.attachments[attachmentIndex];
             if (!att) return;
 
-            // Всегда копируем URL (для изображений это data:image URL)
-            try {
+            if (att.type === 'image') {
+                // Создаем временный элемент img для копирования
+                const img = new Image();
+                img.src = att.value;
+
+                // Ждем загрузки изображения
+                await new Promise((resolve) => {
+                    img.onload = resolve;
+                    img.onerror = resolve;
+                    setTimeout(resolve, 1000);
+                });
+
+                // Создаем canvas и копируем из него
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+
+                canvas.toBlob(async (blob) => {
+                    try {
+                        await navigator.clipboard.write([
+                            new ClipboardItem({
+                                [blob.type]: blob
+                            })
+                        ]);
+                        alert("Изображение скопировано!");
+                    } catch (err) {
+                        console.error('Ошибка:', err);
+                        alert("Не удалось скопировать изображение");
+                    }
+                });
+            } else {
+                // Для ссылок
                 await navigator.clipboard.writeText(att.value);
-                alert("Ссылка скопирована в буфер обмена!");
-            } catch (err) {
-                // Fallback
-                const textarea = document.createElement('textarea');
-                textarea.value = att.value;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
                 alert("Ссылка скопирована!");
             }
         }
