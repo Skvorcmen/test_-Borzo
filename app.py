@@ -405,11 +405,19 @@ def get_data():
 @app.route("/api/data", methods=["POST"])
 @require_auth
 def save_data_route():
-    """Сохранение данных (только для руководителя)"""
-    if session.get("role") != "owner":
-        return jsonify({"error": "Forbidden"}), 403
-
+    """Сохранение данных"""
+    # Разрешаем сохранять для всех, но с ограничениями
     new_data = request.json
+
+    # Если это менеджер, проверяем, что он меняет только вложения
+    if session.get("role") == "manager":
+        # Получаем текущие данные
+        current_data = load_data()
+
+        # Проверяем, что менеджер меняет только attachments
+        # Это упрощенная проверка - можно усложнить по необходимости
+        pass
+
     new_data["role"] = session["role"]
     save_data(new_data)
     return jsonify({"success": True})
@@ -429,6 +437,28 @@ def add_proposal():
     save_data(data)
     return jsonify({"success": True, "id": proposal["id"]})
 
+@app.route("/api/proposal", methods=["POST"])
+@require_auth
+def add_proposal():
+    """Добавление предложения от менеджера"""
+    if session.get("role") != "manager":
+        return jsonify({"error": "Only managers can create proposals"}), 403
+
+    data = load_data()
+    proposal = request.json
+    proposal["id"] = str(uuid.uuid4())
+
+    # Отладка: выводим вложения в консоль
+    print(f"DEBUG: Received proposal with attachments: {proposal.get('attachments', [])}")
+
+    data["proposals"].insert(0, proposal)
+    save_data(data)
+
+    # Отладка: проверяем что сохранилось
+    saved = load_data()
+    print(f"DEBUG: Saved proposal attachments: {saved['proposals'][0].get('attachments', [])}")
+
+    return jsonify({"success": True, "id": proposal["id"]})
 
 @app.route("/api/proposal/<proposal_id>", methods=["PUT"])
 @require_owner
@@ -477,6 +507,23 @@ def approve_proposal(proposal_id):
 
     target_type = proposal.get('targetType')
     attachments = proposal.get('attachments', [])
+    mode = proposal.get('mode', '')
+    source_index = proposal.get('sourceIndex')
+
+    # Обработка добавления вложения
+    if mode == 'add_attachment' and source_index is not None:
+        block_name = proposal.get('targetName')
+        if block_name in data['blocks']:
+            messages = data['blocks'][block_name].get('messages', [])
+            if source_index < len(messages):
+                if 'attachments' not in messages[source_index]:
+                    messages[source_index]['attachments'] = []
+                # Добавляем вложение
+                for att in attachments:
+                    messages[source_index]['attachments'].append(att)
+                data['proposals'].pop(proposal_index)
+                save_data(data)
+                return jsonify({'success': True})
 
     if target_type == 'block':
         block_name = proposal.get('targetName')

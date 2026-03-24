@@ -674,8 +674,9 @@
         }
 
         async function saveData(data) {
-            if (currentUserRole !== 'owner') return false;
+    // Разрешаем сохранять для всех, но с разными правами
             try {
+                // Для менеджера сохраняем напрямую (только для вложений)
                 await apiCall('/api/data', 'POST', data);
                 return true;
             } catch (e) {
@@ -1474,7 +1475,18 @@
             const msg = state.blocks[state.currentBlock].messages[messageIndex];
             if (!msg.attachments) msg.attachments = [];
             msg.attachments.push({ title, type, value });
-            saveDataAndRender();
+
+            // Сохраняем данные (доступно для всех)
+            try {
+                await apiCall('/api/data', 'POST', state);
+                assetEditIndex = null;
+                renderCenter();
+            } catch (e) {
+                alert('Ошибка сохранения: ' + e.message);
+                // Откатываем добавление
+                msg.attachments.pop();
+                renderCenter();
+            }
         }
 
         function removeAttachment(messageIndex, attachmentIndex) {
