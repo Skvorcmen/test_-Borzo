@@ -1325,6 +1325,10 @@
 
         function startInlineProposal(i) {
             inlineProposalIndex = i;
+
+            // Сохраняем вложения в глобальную переменную для использования в saveInlineProposal
+            window.currentInlineAttachments = state.blocks[state.currentBlock].messages[i].attachments || [];
+
             renderCenter();
         }
 
@@ -1338,9 +1342,10 @@
             const text = (document.getElementById('inline-text-' + i).value || '').trim();
             if (!condition || !text) return;
 
-            // Сохраняем существующие вложения
-            const currentMsg = state.blocks[state.currentBlock].messages[i];
-            const attachments = currentMsg.attachments || [];
+            // Используем сохраненные вложения
+            const attachments = window.currentInlineAttachments || [];
+
+            console.log("Saving inline proposal with attachments:", attachments);
 
             await addProposal({
                 id: Date.now() + Math.random(),
@@ -1352,7 +1357,9 @@
                 mode: 'replace',
                 sourceIndex: i
             });
+
             inlineProposalIndex = null;
+            window.currentInlineAttachments = null;
             render();
         }
 
@@ -1361,14 +1368,20 @@
             const text = (document.getElementById('prop-text').value || '').trim();
             if (!condition || !text) return;
 
+            // Получаем вложения из текущего блока? Новое сообщение не имеет вложений
+            const attachments = [];
+
+            console.log("Saving new variant proposal with attachments:", attachments);
+
             await addProposal({
                 id: Date.now() + Math.random(),
                 targetType: 'block',
                 targetName: state.currentBlock,
                 condition: condition,
                 text: text,
-                attachments: [] // Новое сообщение без вложений
+                attachments: attachments
             });
+
             // Очищаем поля
             document.getElementById('prop-name').value = '';
             document.getElementById('prop-text').value = '';
