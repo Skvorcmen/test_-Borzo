@@ -382,9 +382,10 @@ def check_auth():
     return jsonify({"role": None})
 
 
+# ВАЖНО: ДОБАВЛЯЕМ GET МАРШРУТ
 @app.route("/api/data", methods=["GET"])
 def get_data():
-    """Получение всех данных - доступно всем авторизованным"""
+    """Получение всех данных"""
     if "role" not in session:
         return jsonify({"error": "Unauthorized"}), 401
     data = load_data()
@@ -394,7 +395,7 @@ def get_data():
 @app.route("/api/data", methods=["POST"])
 @require_auth
 def save_data_route():
-    """Сохранение данных - доступно всем авторизованным"""
+    """Сохранение данных"""
     new_data = request.json
     current_role = session.get("role")
     new_data["role"] = current_role
