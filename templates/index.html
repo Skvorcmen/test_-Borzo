@@ -674,9 +674,8 @@
         }
 
         async function saveData(data) {
-    // Разрешаем сохранять для всех, но с разными правами
+            // Убираем проверку на owner - разрешаем сохранять всем
             try {
-                // Для менеджера сохраняем напрямую (только для вложений)
                 await apiCall('/api/data', 'POST', data);
                 return true;
             } catch (e) {
@@ -908,11 +907,10 @@
         }
 
         async function saveDataAndRender() {
-            if (isOwner()) {
-                await saveData(state);
-            }
+            // Убираем проверку на owner - сохраняем всегда
+            await saveData(state);
             render();
-        }
+}
 
         function moveItemInArray(arr, fromIndex, toIndex) {
             if (!Array.isArray(arr)) return;
