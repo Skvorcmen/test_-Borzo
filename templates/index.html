@@ -675,16 +675,35 @@
 
         async function saveData(data) {
             try {
+                console.log("DEBUG: saveData called with role:", currentUserRole);
+                console.log("DEBUG: Current block:", data.currentBlock);
+
+                // Проверяем вложения перед отправкой
+                const blockName = data.currentBlock;
+                if (data.blocks && data.blocks[blockName]) {
+                    const messages = data.blocks[blockName].messages;
+                    messages.forEach((msg, i) => {
+                        if (msg.attachments && msg.attachments.length) {
+                            console.log(`DEBUG: Message ${i} has ${msg.attachments.length} attachments`);
+                        }
+                    });
+                }
+
                 const response = await fetch(API_BASE + '/api/data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
+
+                console.log("DEBUG: Response status:", response.status);
+
                 if (!response.ok) {
                     const error = await response.json();
                     throw new Error(error.error || 'Ошибка сохранения');
                 }
-                console.log("Data saved successfully");
+
+                const result = await response.json();
+                console.log("DEBUG: Save result:", result);
                 return true;
             } catch (e) {
                 console.error('Save error:', e);
@@ -1403,6 +1422,7 @@
         function renderAttachmentsHtml(msg, i) {
             const assets = msg.attachments || [];
             let html = "<div class='material-row'><button class='small-btn' onclick='toggleAttachmentEditor(" + i + ")'>Материалы</button><div class='drag-handle' draggable='true' data-drag-handle='" + i + "' title='Перетащить'>⋮⋮</div></div>";
+
             if (assets.length) {
                 html += "<div class='attachments-row'>";
                 assets.forEach((att, idx) => {
@@ -1422,6 +1442,8 @@
                 });
                 html += "</div>";
             }
+
+            // ВАЖНО: редактор добавления материалов
             if (assetEditIndex === i) {
                 html += "<div class='asset-editor'>"
                     + "<div class='asset-editor-grid'>"
@@ -1436,15 +1458,22 @@
                     + "<button class='small-btn' onclick='toggleAttachmentEditor(" + i + ")'>Закрыть</button></div>"
                     + "</div>";
             }
+
             return html;
         }
 
         function toggleAttachmentEditor(i) {
-            assetEditIndex = assetEditIndex === i ? null : i;
-            renderCenter();
+            console.log("toggleAttachmentEditor called for index:", i);
             if (assetEditIndex === i) {
-                setTimeout(function() { updateAssetFields(i); }, 0);
+                assetEditIndex = null;
+            } else {
+                assetEditIndex = i;
+                // Инициализируем поля
+                setTimeout(function() {
+                    updateAssetFields(i);
+                }, 0);
             }
+            renderCenter();
         }
 
         function updateAssetFields(i) {
@@ -1489,33 +1518,11 @@
             if (!msg.attachments) msg.attachments = [];
             msg.attachments.push({ title, type, value });
 
-            // Сохраняем данные
-            try {
-                const response = await fetch(API_BASE + '/api/data', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(state)
-                });
+            console.log("DEBUG: Attachment added, total attachments:", msg.attachments.length);
+            console.log("DEBUG: Current state before save:", JSON.stringify(state.blocks[state.currentBlock].messages[messageIndex].attachments));
 
-                if (!response.ok) {
-                    throw new Error('Ошибка сохранения');
-                }
-
-                console.log("Attachment saved successfully");
-
-                // Перезагружаем данные для синхронизации
-                state = await loadData();
-
-                assetEditIndex = null;
-                render(); // Полный рендер, а не только center
-
-            } catch (e) {
-                console.error('Save error:', e);
-                alert('Ошибка сохранения: ' + e.message);
-                // Откатываем добавление
-                msg.attachments.pop();
-                renderCenter();
-            }
+            // Сохраняем
+            await saveDataAndRender();
         }
 
         function removeAttachment(messageIndex, attachmentIndex) {
