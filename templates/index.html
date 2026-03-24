@@ -658,6 +658,7 @@
 
         async function loadData() {
             try {
+                console.log("Loading data...");
                 const response = await fetch(API_BASE + '/api/data');
                 if (!response.ok) {
                     if (response.status === 401) {
@@ -666,7 +667,21 @@
                     }
                     throw new Error('Ошибка загрузки данных');
                 }
-                return await response.json();
+                const data = await response.json();
+                console.log("Data loaded, blocks:", Object.keys(data.blocks || {}));
+
+                // Проверяем вложения в текущем блоке
+                const currentBlock = data.currentBlock;
+                if (currentBlock && data.blocks[currentBlock]) {
+                    const messages = data.blocks[currentBlock].messages;
+                    messages.forEach((msg, i) => {
+                        if (msg.attachments && msg.attachments.length) {
+                            console.log(`Message ${i} has ${msg.attachments.length} attachments on load`);
+                        }
+                    });
+                }
+
+                return data;
             } catch (e) {
                 console.error(e);
                 return null;
