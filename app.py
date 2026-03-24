@@ -1,3 +1,17 @@
+import json
+import os
+from flask import Flask, render_template, request, jsonify, session
+from functools import wraps
+import uuid
+
+app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "borzo_secret_key_change_in_production")
+
+DATA_FILE = "data.json"
+
+# Пароли для ролей
+PASSWORDS = {"manager": "4007", "owner": "7004"}
+
 # Начальные данные по умолчанию
 DEFAULT_DATA = {
     "role": "manager",
@@ -298,23 +312,6 @@ DEFAULT_DATA = {
     "proposals": [],
     "managerMessages": [],
 }
-
-import json
-import os
-from flask import Flask, render_template, request, jsonify, session
-from functools import wraps
-import uuid
-
-app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "borzo_secret_key_change_in_production")
-
-DATA_FILE = "data.json"
-
-# Пароли для ролей
-PASSWORDS = {"manager": "4007", "owner": "7004"}
-
-# Начальные данные по умолчанию (ваш DEFAULT_DATA здесь...)
-# ... (вставьте ваш DEFAULT_DATA)
 
 
 def load_data():
