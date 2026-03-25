@@ -1289,8 +1289,90 @@
                 div.className = 'proposal-card';
 
                 if (isOwner() && ownerEditProposalIndex === i) {
-                    div.innerHTML = "<div>Редактирование...</div>";
+                    // Режим редактирования предложения
+                    let editHtml = "<div class='muted' style='margin-bottom:8px'>✏️ Редактирование предложения</div>";
+
+                    if (p.targetType === 'main-list') {
+                        editHtml += "<input id='owner-prop-block-" + i + "' class='input' style='margin-bottom:8px' value='" + escAttr(p.blockName || '') + "' placeholder='Название блока'>";
+                        editHtml += "<input id='owner-prop-condition-" + i + "' class='input' style='margin-bottom:8px' value='" + escAttr(p.condition || '') + "' placeholder='Назначение / когда использовать'>";
+                    } else if (p.targetType === 'section') {
+                        editHtml += "<input id='owner-prop-block-" + i + "' class='input' style='margin-bottom:8px' value='" + escAttr(p.blockName || '') + "' placeholder='Название элемента'>";
+                        editHtml += "<input id='owner-prop-condition-" + i + "' class='input' style='margin-bottom:8px' value='" + escAttr(p.condition || '') + "' placeholder='Назначение / когда использовать'>";
+                    } else if (p.targetType === 'new-section') {
+                        editHtml += "<input id='owner-prop-section-" + i + "' class='input' style='margin-bottom:8px' value='" + escAttr(p.sectionName || '') + "' placeholder='Название раздела'>";
+                        editHtml += "<input id='owner-prop-block-" + i + "' class='input' style='margin-bottom:8px' value='" + escAttr(p.blockName || '') + "' placeholder='Название первого элемента'>";
+                        editHtml += "<input id='owner-prop-condition-" + i + "' class='input' style='margin-bottom:8px' value='" + escAttr(p.condition || '') + "' placeholder='Назначение / когда использовать'>";
+                    } else {
+                        editHtml += "<input id='owner-prop-condition-" + i + "' class='input' style='margin-bottom:8px' value='" + escAttr(p.condition || '') + "' placeholder='Назначение / когда использовать'>";
+                    }
+
+                    editHtml += "<textarea id='owner-prop-text-" + i + "' class='textarea' style='margin-bottom:8px' placeholder='Текст'>" + esc(p.text || '') + "</textarea>";
+
+                    div.innerHTML = editHtml;
+
+                    const tools = document.createElement('div');
+                    tools.className = 'toolbar';
+
+                    // Кнопка "Сохранить и одобрить"
+                    const saveAndApprove = document.createElement('button');
+                    saveAndApprove.className = 'small-btn gold-btn';
+                    saveAndApprove.textContent = '✅ Сохранить и одобрить';
+                    saveAndApprove.onclick = async () => {
+                        const newCondition = document.getElementById('owner-prop-condition-' + i)?.value.trim() || p.condition;
+                        const newText = document.getElementById('owner-prop-text-' + i)?.value.trim() || p.text;
+
+                        if (!newCondition || !newText) {
+                            alert("Заполните все поля");
+                            return;
+                        }
+
+                        const updatedProposal = { ...p, condition: newCondition, text: newText };
+
+                        if (p.targetType === 'main-list' || p.targetType === 'section') {
+                            updatedProposal.blockName = document.getElementById('owner-prop-block-' + i)?.value.trim() || p.blockName;
+                        }
+                        if (p.targetType === 'new-section') {
+                            updatedProposal.sectionName = document.getElementById('owner-prop-section-' + i)?.value.trim() || p.sectionName;
+                            updatedProposal.blockName = document.getElementById('owner-prop-block-' + i)?.value.trim() || p.blockName;
+                            updatedProposal.condition = newCondition;
+                        }
+
+                        await apiCall(`/api/proposal/${p.id}`, 'PUT', updatedProposal);
+                        await approveProposal(p.id);
+                        ownerEditProposalIndex = null;
+                        state = await loadData();
+                        render();
+                    };
+                    tools.appendChild(saveAndApprove);
+
+                    // Кнопка "Отмена"
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.className = 'small-btn';
+                    cancelBtn.textContent = 'Отмена';
+                    cancelBtn.onclick = () => {
+                        ownerEditProposalIndex = null;
+                        render();
+                    };
+                    tools.appendChild(cancelBtn);
+
+                    // Кнопка "Отклонить"
+                    const rejectBtn = document.createElement('button');
+                    rejectBtn.className = 'small-btn danger-btn';
+                    rejectBtn.textContent = 'Отклонить';
+                    rejectBtn.onclick = async () => {
+                        const comment = await showPromptModal('Комментарий по отклонению', 'Почему отклонено?', '');
+                        if (comment !== null) {
+                            await rejectProposal(p.id, comment);
+                            ownerEditProposalIndex = null;
+                            render();
+                        }
+                    };
+                    tools.appendChild(rejectBtn);
+
+                    div.appendChild(tools);
+
                 } else {
+                    // Обычный просмотр предложения
                     let previewHtml = "<div class='muted' style='margin-bottom:6px'>" + esc(target) + "</div>";
                     if (p.targetType === 'new-section') {
                         previewHtml += "<div class='proposal-title'>Раздел: " + esc(p.sectionName || '') + "</div>";
