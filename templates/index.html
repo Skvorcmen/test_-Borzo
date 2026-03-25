@@ -1277,7 +1277,10 @@
             if (!el) return;
             badge.innerHTML = state.proposals.length ? "<span class='badge'>" + state.proposals.length + "</span>" : "";
             el.innerHTML = '';
-            if (!state.proposals.length) { el.innerHTML = "<div class='empty'>Пока предложений нет</div>"; return; }
+            if (!state.proposals.length) {
+                el.innerHTML = "<div class='empty'>Пока предложений нет</div>";
+                return;
+            }
 
             state.proposals.forEach((p, i) => {
                 let target = 'Блок: ' + p.targetName;
@@ -1288,8 +1291,8 @@
                 const div = document.createElement('div');
                 div.className = 'proposal-card';
 
+                // ========== РЕЖИМ РЕДАКТИРОВАНИЯ (С КОРРЕКТИРОВКОЙ) ==========
                 if (isOwner() && ownerEditProposalIndex === i) {
-                    // Режим редактирования предложения
                     let editHtml = "<div class='muted' style='margin-bottom:8px'>✏️ Редактирование предложения</div>";
 
                     if (p.targetType === 'main-list') {
@@ -1355,25 +1358,12 @@
                     };
                     tools.appendChild(cancelBtn);
 
-                    // Кнопка "Отклонить"
-                    const rejectBtn = document.createElement('button');
-                    rejectBtn.className = 'small-btn danger-btn';
-                    rejectBtn.textContent = 'Отклонить';
-                    rejectBtn.onclick = async () => {
-                        const comment = await showPromptModal('Комментарий по отклонению', 'Почему отклонено?', '');
-                        if (comment !== null) {
-                            await rejectProposal(p.id, comment);
-                            ownerEditProposalIndex = null;
-                            render();
-                        }
-                    };
-                    tools.appendChild(rejectBtn);
-
                     div.appendChild(tools);
 
+                // ========== ОБЫЧНЫЙ ПРОСМОТР ==========
                 } else {
-                    // Обычный просмотр предложения
                     let previewHtml = "<div class='muted' style='margin-bottom:6px'>" + esc(target) + "</div>";
+
                     if (p.targetType === 'new-section') {
                         previewHtml += "<div class='proposal-title'>Раздел: " + esc(p.sectionName || '') + "</div>";
                         previewHtml += "<div class='muted'><b>Первый элемент:</b> " + esc(p.blockName || '') + "</div>";
@@ -1390,52 +1380,73 @@
                     } else {
                         previewHtml += "<div class='proposal-title'>" + esc(p.condition) + "</div><div class='muted'>" + esc(p.text) + "</div>";
                     }
+
                     if (p.attachments && p.attachments.length) {
                         previewHtml += "<div class='attachments-row' style='margin-top:8px'>";
                         p.attachments.forEach((att) => {
                             previewHtml += "<div class='asset-chip'><div class='asset-chip-title'>" + esc(att.title) + "</div>";
-                            if (att.type === 'image') previewHtml += "<img src='" + escAttr(att.value) + "' style='max-width:100px;max-height:60px'>";
-                            else previewHtml += "<div class='asset-chip-link'>" + esc(att.value) + "</div>";
+                            if (att.type === 'image') {
+                                previewHtml += "<img src='" + escAttr(att.value) + "' style='max-width:100px;max-height:60px'>";
+                            } else {
+                                previewHtml += "<div class='asset-chip-link'>" + esc(att.value) + "</div>";
+                            }
                             previewHtml += "</div>";
                         });
                         previewHtml += "</div>";
                     }
+
                     div.innerHTML = previewHtml;
 
                     const tools = document.createElement('div');
                     tools.className = 'toolbar';
+
                     if (!isOwner()) {
                         const edit = document.createElement('button');
                         edit.className = 'small-btn';
                         edit.textContent = 'Изменить';
                         edit.onclick = async () => await editProposalAsManager(p);
                         tools.appendChild(edit);
+
                         const del = document.createElement('button');
                         del.className = 'small-btn danger-btn';
                         del.textContent = 'Удалить';
-                        del.onclick = async () => { if (await showConfirmModal('Удалить предложение?', '')) await deleteProposal(p.id); };
+                        del.onclick = async () => {
+                            if (await showConfirmModal('Удалить предложение?', '')) {
+                                await deleteProposal(p.id);
+                            }
+                        };
                         tools.appendChild(del);
                     }
+
                     if (isOwner()) {
                         const add = document.createElement('button');
                         add.className = 'small-btn gold-btn';
-                        add.textContent = 'Добавить';
+                        add.textContent = '✅ Одобрить';
                         add.onclick = () => approveProposal(p.id);
                         tools.appendChild(add);
+
                         const corr = document.createElement('button');
                         corr.className = 'small-btn gold-btn';
-                        corr.textContent = 'С корректировкой';
-                        corr.onclick = () => { ownerEditProposalIndex = i; render(); };
+                        corr.textContent = '✏️ С корректировкой';
+                        corr.onclick = () => {
+                            console.log("Edit clicked for proposal", i);
+                            ownerEditProposalIndex = i;
+                            render();
+                        };
                         tools.appendChild(corr);
+
                         const rej = document.createElement('button');
                         rej.className = 'small-btn danger-btn';
-                        rej.textContent = 'Отклонить';
+                        rej.textContent = '❌ Отклонить';
                         rej.onclick = async () => {
                             const comment = await showPromptModal('Комментарий по отклонению', 'Почему отклонено?', '');
-                            if (comment !== null) await rejectProposal(p.id, comment);
+                            if (comment !== null) {
+                                await rejectProposal(p.id, comment);
+                            }
                         };
                         tools.appendChild(rej);
                     }
+
                     div.appendChild(tools);
                 }
                 el.appendChild(div);
