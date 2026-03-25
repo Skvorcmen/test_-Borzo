@@ -960,7 +960,6 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            alert(`📁 Изображение "${att.title}" скачано!`);
         }
 
         async function copyLink(messageIndex, attachmentIndex) {
@@ -969,7 +968,6 @@
             if (!att || att.type !== 'link') return;
             try {
                 await navigator.clipboard.writeText(att.value);
-                alert("🔗 Ссылка скопирована!");
             } catch (err) {
                 const textarea = document.createElement('textarea');
                 textarea.value = att.value;
@@ -977,7 +975,6 @@
                 textarea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textarea);
-                alert("🔗 Ссылка скопирована!");
             }
         }
 
@@ -991,7 +988,6 @@
                 await navigator.clipboard.write([
                     new ClipboardItem({ [blob.type]: blob })
                 ]);
-                alert("✅ Изображение скопировано! Можно вставить (Ctrl+V)");
             } catch (err) {
                 console.error('Ошибка копирования:', err);
                 alert("❌ Не удалось скопировать изображение. Попробуйте скачать.");
