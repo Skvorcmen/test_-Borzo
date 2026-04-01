@@ -4,7 +4,7 @@
 
 ## 🌐 Демо
 
-Приложение доступно по адресу: [https://test--borzo.onrender.com](https://test--borzo.onrender.com)
+Приложение доступно по адресу: [[https://test--borzo.onrender.com](https://test--borzo.onrender.com)](https://skvorcmen.pythonanywhere.com/)
 
 ## 👥 Роли и доступ
 
@@ -36,6 +36,6 @@
 - **Backend**: Python 3 + Flask
 - **Frontend**: HTML5, CSS3, Vanilla JavaScript
 - **Хранение данных**: JSON файл (data.json)
-- **Деплой**: Render.com (бесплатный хостинг)
+- **Деплой**: pythonanywhere.com
 
 ## 📁 Структура проекта
